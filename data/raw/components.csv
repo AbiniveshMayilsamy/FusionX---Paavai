@@ -1,0 +1,31 @@
+component_id,name,category,criticality_level,avg_cost
+1,Software License,Raw Materials,1,7138.31
+2,Glass Panel,Software,3,3203.9
+3,Foam Padding,Electronics,2,1516.8
+4,Copper Wire,Mechanical,2,651.65
+5,Silicon Wafer,Software,5,4664.58
+6,Circuit Board,Mechanical,4,3900.87
+7,Plastic Wrap,Electronics,5,3810.01
+8,Microprocessor,Software,3,7537.22
+9,Silicon Wafer,Packaging,5,8000.68
+10,Glass Panel,Raw Materials,2,2736.62
+11,Ceramic Component,Electronics,4,3367.93
+12,Copper Wire,Mechanical,4,9196.22
+13,Label Sticker,Packaging,1,9070.22
+14,Plastic Wrap,Packaging,1,848.64
+15,Silicon Wafer,Mechanical,4,1825.47
+16,Software License,Raw Materials,3,2124.49
+17,Operating System,Software,4,2789.78
+18,Silicon Wafer,Software,1,4708.37
+19,Foam Padding,Electronics,3,2249.98
+20,Memory Module,Electronics,1,9496.62
+21,Plastic Housing,Electronics,5,1532.3
+22,Steel Plate,Raw Materials,1,5644.06
+23,Plastic Housing,Raw Materials,3,7671.31
+24,Aluminum Frame,Packaging,5,9637.71
+25,Power Supply,Mechanical,3,1089.91
+26,Microprocessor,Software,5,6776.7
+27,Copper Wire,Raw Materials,2,769.2
+28,Glass Panel,Electronics,3,8504.43
+29,Label Sticker,Electronics,5,7828.53
+30,Driver Software,Packaging,4,6618.6

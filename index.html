@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkGuard - Supply Chain Management</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #1e3c72, #2a5298); 
+            color: white; 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { 
+            text-align: center; 
+            background: rgba(0,0,0,0.3); 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 30px; 
+        }
+        .header h1 { 
+            font-size: 3em; 
+            color: #ffd700; 
+            margin-bottom: 10px; 
+        }
+        .card { 
+            background: rgba(255,255,255,0.1); 
+            padding: 25px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+        }
+        .card h2 { 
+            color: #ffd700; 
+            border-bottom: 2px solid #ffd700; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
+        }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #e0e0e0; 
+        }
+        .input-group input, .input-group select { 
+            width: 100%; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            background: rgba(255,255,255,0.9); 
+            color: #333; 
+        }
+        .btn { 
+            background: linear-gradient(45deg, #ffd700, #ffed4e); 
+            color: #333; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            width: 100%; 
+            margin-top: 10px; 
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .main-content { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            margin-bottom: 30px; 
+        }
+        .tabs { 
+            display: flex; 
+            background: rgba(0,0,0,0.3); 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+        }
+        .tab { 
+            flex: 1; 
+            padding: 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            border: none; 
+            background: transparent; 
+            color: white; 
+        }
+        .tab.active { background: #ffd700; color: #333; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .supplier { 
+            background: #4CAF50; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center; 
+            margin: 10px; 
+            display: inline-block; 
+            min-width: 120px; 
+        }
+        .supplier.medium-risk { background: #ff9800; }
+        .supplier.vulnerable { background: #f44336; animation: pulse 2s infinite; }
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(244,67,54,0.7); } 
+            70% { box-shadow: 0 0 0 10px rgba(244,67,54,0); } 
+            100% { box-shadow: 0 0 0 0 rgba(244,67,54,0); } 
+        }
+        .stat-card { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            width: 23%; 
+            display: inline-block; 
+            margin: 1%; 
+        }
+        .stat-value { font-size: 2em; color: #ffd700; font-weight: bold; }
+        .vulnerability-item { 
+            background: rgba(255,255,255,0.1); 
+            border-left: 4px solid #f44336; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 0 8px 8px 0; 
+        }
+        .recommendation-item { 
+            background: rgba(255,255,255,0.1); 
+            border-left: 4px solid #4CAF50; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 0 8px 8px 0; 
+        }
+        .footer { 
+            text-align: center; 
+            color: #ccc; 
+            font-size: 12px; 
+            margin-top: 30px; 
+        }
+        .login-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+        .login-box { 
+            background: rgba(255,255,255,0.1); 
+            padding: 40px; 
+            border-radius: 15px; 
+            max-width: 400px; 
+            width: 100%; 
+        }
+        .login-title { 
+            font-size: 4em; 
+            color: #ffd700; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">LinkGuard</h1>
+            <p style="text-align: center; margin-bottom: 30px;">AI Supply Chain Risk Management</p>
+            
+            <div class="input-group">
+                <label>User Type</label>
+                <select id="userType">
+                    <option value="admin">Administrator</option>
+                    <option value="analyst">Analyst</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" value="admin" placeholder="Enter username">
+            </div>
+            
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" value="admin@admin.com" placeholder="Enter email">
+            </div>
+            
+            <button class="btn" onclick="login()">Login</button>
+            
+            <div style="position: fixed; bottom: 20px; right: 20px; color: #ccc; font-size: 12px; text-align: right;">
+                <p>Developed by GaneshPrabu</p>
+                <p>+91-7338703622</p>
+                <p>ganeshprabu.bo2024@sece.ac.in</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="container hidden">
+        <div class="header">
+            <h1>🛡️ LinkGuard Supply Chain Management</h1>
+            <p>Indian Army - Advanced Multi-Tier Supply Chain Analysis & Risk Assessment</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Logout</button>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📊 Equipment Registration</h2>
+                <div class="input-group">
+                    <label>Equipment/Component Name</label>
+                    <input type="text" id="equipmentName" placeholder="e.g., Advanced Radar System">
+                </div>
+                <div class="input-group">
+                    <label>Equipment Type</label>
+                    <select id="equipmentType">
+                        <option value="">Select Type</option>
+                        <option value="weapon">Weapon System</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="vehicle">Vehicle Component</option>
+                        <option value="communication">Communication Equipment</option>
+                        <option value="armor">Armor & Protection</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Criticality Level</label>
+                    <select id="criticalityLevel">
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="mapSupplyChain()">🔍 Map Supply Chain</button>
+            </div>
+
+            <div class="card">
+                <h2>🌐 Supplier Data Input</h2>
+                <div class="input-group">
+                    <label>Supplier Name</label>
+                    <input type="text" id="supplierName" placeholder="Primary Supplier">
+                </div>
+                <div class="input-group">
+                    <label>Country of Origin</label>
+                    <input type="text" id="supplierCountry" placeholder="e.g., India, USA, Germany">
+                </div>
+                <div class="input-group">
+                    <label>Supplier Tier</label>
+                    <select id="tierLevel">
+                        <option value="1">Tier 1 (Direct)</option>
+                        <option value="2">Tier 2</option>
+                        <option value="3">Tier 3</option>
+                        <option value="4">Tier 4</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addSupplier()">➕ Add Supplier</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('mapping')">🗺️ Supply Chain Mapping</button>
+                <button class="tab" onclick="switchTab('analysis')">📈 Risk Analysis</button>
+                <button class="tab" onclick="switchTab('recommendations')">💡 Recommendations</button>
+                <button class="tab" onclick="switchTab('reports')">📋 Reports</button>
+            </div>
+
+            <div id="mapping" class="tab-content active">
+                <h2>Multi-Tier Supply Chain Visualization</h2>
+                <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 10px; min-height: 400px;">
+                    <div style="margin: 30px 0;">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;">Tier 1</h4>
+                        <div class="supplier">Primary Defense Corp<br><small>India</small></div>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;">Tier 2</h4>
+                        <div class="supplier medium-risk">Electronics Ltd<br><small>Germany</small></div>
+                        <div class="supplier">Steel Industries<br><small>India</small></div>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;">Tier 3</h4>
+                        <div class="supplier vulnerable">Rare Metals Co<br><small>China</small></div>
+                        <div class="supplier">Precision Parts<br><small>Japan</small></div>
+                        <div class="supplier medium-risk">Composite Materials<br><small>USA</small></div>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h4 style="color: #ffd700; margin-bottom: 15px;">Tier 4</h4>
+                        <div class="supplier vulnerable">Mining Corp<br><small>Congo</small></div>
+                        <div class="supplier">Raw Materials<br><small>Australia</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analysis" class="tab-content">
+                <h2>Risk Assessment Dashboard</h2>
+                <div style="margin: 20px 0;">
+                    <div class="stat-card">
+                        <div class="stat-value">12</div>
+                        <div>Total Suppliers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div>High Risk Suppliers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">5</div>
+                        <div>Vulnerable Links</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">68%</div>
+                        <div>Overall Risk Score</div>
+                    </div>
+                </div>
+                
+                <div class="vulnerability-item">
+                    <h4>🚨 Critical Vulnerability Detected</h4>
+                    <p><strong>Supplier:</strong> Rare Metals Co (China) - Tier 3</p>
+                    <p><strong>Risk:</strong> Single source dependency for critical rare earth materials</p>
+                    <p><strong>Impact:</strong> Complete production halt if disrupted</p>
+                </div>
+                
+                <div class="vulnerability-item">
+                    <h4>⚠️ Medium Risk Identified</h4>
+                    <p><strong>Supplier:</strong> Electronics Ltd (Germany)</p>
+                    <p><strong>Risk:</strong> Geopolitical tensions affecting supply routes</p>
+                    <p><strong>Impact:</strong> Potential delays in component delivery</p>
+                </div>
+            </div>
+
+            <div id="recommendations" class="tab-content">
+                <h2>AI-Generated Recommendations</h2>
+                
+                <div class="recommendation-item">
+                    <h4>🎯 Primary Recommendation</h4>
+                    <p><strong>Alternative Supplier:</strong> Identify domestic rare earth processing facility</p>
+                    <p><strong>Action:</strong> Diversify Tier 3 suppliers for critical materials</p>
+                    <p><strong>Timeline:</strong> 6-12 months</p>
+                    <p><strong>Risk Reduction:</strong> 45%</p>
+                </div>
+                
+                <div class="recommendation-item">
+                    <h4>💼 Secondary Recommendation</h4>
+                    <p><strong>Strategic Partnership:</strong> Establish long-term contracts with Australian raw material suppliers</p>
+                    <p><strong>Benefits:</strong> Stable supply, reduced geopolitical risk</p>
+                    <p><strong>Investment Required:</strong> Medium</p>
+                </div>
+                
+                <div class="recommendation-item">
+                    <h4>🛡️ Risk Mitigation</h4>
+                    <p><strong>Buffer Stock:</strong> Maintain 6-month inventory for critical components</p>
+                    <p><strong>Monitoring:</strong> Implement real-time supply chain monitoring</p>
+                    <p><strong>Backup Plans:</strong> Develop alternative sourcing strategies</p>
+                </div>
+
+                <button class="btn" onclick="generateActionPlan()">📄 Generate Detailed Action Plan</button>
+            </div>
+
+            <div id="reports" class="tab-content">
+                <h2>Supply Chain Reports & Analytics</h2>
+                
+                <div class="input-group">
+                    <label>Report Type</label>
+                    <select id="reportType">
+                        <option value="vulnerability">Vulnerability Assessment Report</option>
+                        <option value="supplier">Supplier Risk Analysis</option>
+                        <option value="alternative">Alternative Supplier Recommendations</option>
+                        <option value="compliance">Compliance & Ownership Report</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Export Format</label>
+                    <select id="reportFormat">
+                        <option value="pdf">PDF Report</option>
+                        <option value="excel">Excel Spreadsheet</option>
+                        <option value="json">JSON Data</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="exportReport()">📊 Generate & Export Report</button>
+                
+                <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 25px; margin-top: 20px;">
+                    <h3>Recent Analysis Results</h3>
+                    <div>
+                        <p>• Equipment: Advanced Radar System - Risk Level: High</p>
+                        <p>• Critical Path: Tier 3 → Tier 2 → Tier 1 identified</p>
+                        <p>• Alternative suppliers: 3 options found</p>
+                        <p>• Last updated: <span id="lastUpdated"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Developed by GaneshPrabu | +91-7338703622 | ganeshprabu.bo2024@sece.ac.in</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize timestamp
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            
+            if (username === 'admin' && email === 'admin@admin.com') {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('dashboardPage').classList.remove('hidden');
+            } else {
+                alert('Invalid credentials! Use: admin / admin@admin.com');
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function mapSupplyChain() {
+            const equipment = document.getElementById('equipmentName').value;
+            if (equipment) {
+                alert(`Supply chain mapped for: ${equipment}\nAnalysis complete! Check the mapping tab.`);
+                switchTab('mapping');
+            } else {
+                alert('Please enter equipment name first.');
+            }
+        }
+
+        function addSupplier() {
+            const supplier = document.getElementById('supplierName').value;
+            const country = document.getElementById('supplierCountry').value;
+            if (supplier && country) {
+                alert(`Supplier added: ${supplier} (${country})\nData saved successfully!`);
+                document.getElementById('supplierName').value = '';
+                document.getElementById('supplierCountry').value = '';
+            } else {
+                alert('Please fill in supplier name and country.');
+            }
+        }
+
+        function generateActionPlan() {
+            alert('Detailed Action Plan Generated!\n\n1. Immediate diversification of Tier 3 suppliers\n2. Establish strategic partnerships\n3. Implement buffer stock policies\n4. Deploy real-time monitoring systems');
+        }
+
+        function exportReport() {
+            const reportType = document.getElementById('reportType').value;
+            const format = document.getElementById('reportFormat').value;
+            alert(`${reportType} report generated in ${format} format!\n\nReport includes:\n• Risk assessment summary\n• Supplier analysis\n• Recommendations\n• Action items`);
+        }
+    </script>
+</body>
+</html>

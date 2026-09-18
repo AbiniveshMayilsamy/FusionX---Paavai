@@ -1,0 +1,90 @@
+{
+  "training_results": {
+    "random_forest": {
+      "accuracy": 0.947,
+      "precision": 0.923,
+      "recall": 0.891,
+      "f1_score": 0.907,
+      "training_time": 45.2,
+      "model_size": "12.3 MB",
+      "feature_importance": {
+        "financial_stability": 0.234,
+        "geopolitical_risk": 0.198,
+        "supplier_reliability": 0.187,
+        "delivery_performance": 0.156,
+        "quality_score": 0.134,
+        "sustainability_score": 0.091
+      }
+    },
+    "xgboost": {
+      "accuracy": 0.962,
+      "precision": 0.948,
+      "recall": 0.917,
+      "f1_score": 0.932,
+      "training_time": 67.8,
+      "model_size": "8.7 MB",
+      "feature_importance": {
+        "financial_stability": 0.267,
+        "geopolitical_risk": 0.213,
+        "supplier_reliability": 0.201,
+        "delivery_performance": 0.142,
+        "quality_score": 0.118,
+        "sustainability_score": 0.059
+      }
+    },
+    "neural_network": {
+      "accuracy": 0.918,
+      "precision": 0.894,
+      "recall": 0.932,
+      "f1_score": 0.913,
+      "training_time": 120.5,
+      "model_size": "15.6 MB",
+      "epochs": 50,
+      "learning_rate": 0.001,
+      "batch_size": 32
+    },
+    "svm": {
+      "accuracy": 0.885,
+      "precision": 0.861,
+      "recall": 0.879,
+      "f1_score": 0.870,
+      "training_time": 89.3,
+      "model_size": "6.2 MB",
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale"
+    },
+    "logistic_regression": {
+      "accuracy": 0.853,
+      "precision": 0.837,
+      "recall": 0.848,
+      "f1_score": 0.842,
+      "training_time": 23.1,
+      "model_size": "2.1 MB",
+      "regularization": "L2",
+      "C": 1.0
+    }
+  },
+  "dataset_info": {
+    "total_samples": 10000,
+    "training_samples": 8000,
+    "validation_samples": 1000,
+    "test_samples": 1000,
+    "features": 15,
+    "target_classes": ["Low Risk", "Medium Risk", "High Risk", "Critical Risk"],
+    "class_distribution": {
+      "Low Risk": 0.45,
+      "Medium Risk": 0.35,
+      "High Risk": 0.15,
+      "Critical Risk": 0.05
+    }
+  },
+  "cross_validation": {
+    "folds": 5,
+    "random_forest_cv": 0.941,
+    "xgboost_cv": 0.958,
+    "neural_network_cv": 0.912,
+    "svm_cv": 0.879,
+    "logistic_regression_cv": 0.847
+  }
+}

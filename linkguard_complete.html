@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkGuard - AI Supply Chain Mapping System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .supply-chain-map {
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tier {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .tier-label {
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .supplier {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .supplier:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .supplier.vulnerable {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            animation: pulse 2s infinite;
+        }
+
+        .supplier.medium-risk {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+        }
+
+        .connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #ffd700, #fff);
+            z-index: 1;
+        }
+
+        .results-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .vulnerability-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .recommendation-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(90deg, #4CAF50, #ffeb3b, #f44336);
+            border-radius: 10px;
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .risk-indicator {
+            width: 10px;
+            height: 30px;
+            background: #fff;
+            border-radius: 5px;
+            position: absolute;
+            top: -5px;
+            transition: all 0.5s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            color: #fff;
+        }
+
+        .tab.active {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left: 4px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #ffd700;
+        }
+
+        /* Enhanced Login Styles */
+        .login-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            animation: floatBubbles 20s infinite linear;
+        }
+        
+        @keyframes floatBubbles {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-form {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .login-form:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        .login-header h1 {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-header p {
+            color: #34495e;
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .login-title {
+            font-size: 4.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            color: #fff;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+        
+        .form-group input:hover, .form-group select:hover {
+            border-color: #ffd700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.4);
+        } center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: floatBubbles 20s infinite linear;
+        }
+        
+        @keyframes floatBubbles {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-form:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-title {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            position: relative;
+            color: #333;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 1);
+            outline: none;
+        }
+        
+        .form-group input:hover, .form-group select:hover {
+            border-color: #764ba2;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-title {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .hidden { display: none; }
+
+        .download-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #ffd700;
+            z-index: 10001;
+            display: none;
+            min-width: 400px;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Execution Effects */
+        .execution-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #000000, #1a1a1a, #000000);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeInOverlay 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .execution-content {
+            text-align: center;
+            color: white;
+            max-width: 80%;
+        }
+        
+        .execution-text {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: typewriter 3s steps(40) forwards;
+            border-right: 3px solid #00ff00;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        @keyframes typewriter {
+            from { width: 0; opacity: 1; }
+            to { width: 100%; opacity: 1; }
+        }
+        
+        .ai-processing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .ai-processing-text {
+            font-size: 1.5em;
+            margin-right: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .processing-dots {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .processing-dot {
+            width: 15px;
+            height: 15px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .processing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .processing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        .execution-buttons {
+            margin-top: 40px;
+        }
+        
+        .execution-btn {
+            padding: 15px 30px;
+            margin: 0 15px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+        
+        .execution-btn:hover {
+            background: #00ff00;
+            color: black;
+            box-shadow: 0 0 20px #00ff00;
+        }
+        
+        .hover-effect {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-effect:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { background: rgba(0, 0, 0, 0.8); }
+            51%, 100% { background: rgba(40, 40, 40, 0.9); }
+        }
+
+        .ai-assistant-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            border: 2px solid #00ff00;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .ai-assistant-header {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ai-chat-area {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ai-input-area {
+            padding: 15px;
+            border-top: 1px solid #00ff00;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ai-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            border: none;
+            color: black;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .ai-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 255, 0, 0.5);
+        }
+
+        .synthetic-data-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .data-sample {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .contract-sample {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .access-steps {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Enhanced Features */
+        .ai-insights {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .predictive-analytics {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .blockchain-verification {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 12px;
+        }
+
+        .real-time-monitor {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            animation: statusBlink 2s infinite;
+        }
+
+        .status-online { background: #4CAF50; }
+        .status-warning { background: #ff9800; }
+        .status-offline { background: #f44336; }
+
+        @keyframes statusBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .geopolitical-risk {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .sustainability-score {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: footerShine 3s infinite;
+        }
+        
+        @keyframes footerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .developer-info {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .developer-contact {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tier {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .tier-label {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <div class="login-header">
+                <h1>LinkGuard</h1>
+                <p>AI-Powered Supply Chain Intelligence Platform</p>
+            </div>
+            <h1 class="login-title">LG</h1>
+            
+            <div class="form-group">
+                <label for="userType">User Type</label>
+                <select id="userType">
+                    <option value="admin">Administrator</option>
+                    <option value="analyst">Supply Chain Analyst</option>
+                    <option value="viewer">Risk Assessment Viewer</option>
+                    <option value="auditor">Compliance Auditor</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            
+            <button class="login-btn" onclick="login()">🔐 Secure Login</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="container hidden">
+        <div class="header">
+            <h1>🛡️ LinkGuard AI Supply Chain Intelligence</h1>
+            <p>Advanced Multi-Tier Supply Chain Mapping & Predictive Risk Analytics Platform</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">🚪 Logout</button>
+        </div>
+
+        <!-- NEW: Real-time Status Dashboard -->
+        <div class="card full-width">
+            <h2>🔴 Real-Time Supply Chain Status Monitor</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="real-time-monitor">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Primary Suppliers:</strong> 8/10 Online
+                </div>
+                <div class="real-time-monitor">
+                    <span class="status-indicator status-warning"></span>
+                    <strong>Tier 2 Suppliers:</strong> 15/18 Operational
+                </div>
+                <div class="real-time-monitor">
+                    <span class="status-indicator status-offline"></span>
+                    <strong>Critical Alert:</strong> 2 Suppliers Offline
+                </div>
+                <div class="real-time-monitor">
+                    <span class="status-indicator status-online"></span>
+                    <strong>Blockchain Verified:</strong> 95% Supply Chain
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>📊 Advanced Equipment Registration</h2>
+                <div class="input-group">
+                    <label for="equipmentName">Equipment/Component Name</label>
+                    <input type="text" id="equipmentName" placeholder="e.g., Advanced Radar System">
+                </div>
+                <div class="input-group">
+                    <label for="equipmentType">Equipment Type</label>
+                    <select id="equipmentType">
+                        <option value="">Select Type</option>
+                        <option value="weapon">🔫 Weapon System</option>
+                        <option value="electronics">📡 Electronics</option>
+                        <option value="vehicle">🚗 Vehicle Component</option>
+                        <option value="communication">📻 Communication Equipment</option>
+                        <option value="armor">🛡️ Armor & Protection</option>
+                        <option value="cyber">💻 Cyber Security</option>
+                        <option value="aerospace">✈️ Aerospace</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="criticalityLevel">Criticality Level</label>
+                    <select id="criticalityLevel">
+                        <option value="critical">🔴 Critical</option>
+                        <option value="high">🟠 High</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                </div>
+                <!-- NEW: AI Risk Prediction -->
+                <div class="input-group">
+                    <label for="aiRiskPrediction">AI Risk Prediction</label>
+                    <select id="aiRiskPrediction">
+                        <option value="enabled">🤖 Enable AI Analysis</option>
+                        <option value="disabled">Manual Assessment</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="registerEquipment()">🔍 AI-Powered Supply Chain Mapping</button>
+            </div>
+
+            <div class="card">
+                <h2>🌐 Enhanced Supplier Intelligence</h2>
+                <div class="input-group">
+                    <label for="supplierName">Supplier Name</label>
+                    <input type="text" id="supplierName" placeholder="Primary Supplier">
+                </div>
+                <div class="input-group">
+                    <label for="supplierCountry">Country of Origin</label>
+                    <input type="text" id="supplierCountry" placeholder="e.g., India, USA, Germany">
+                </div>
+                <div class="input-group">
+                    <label for="ownershipDetails">Ownership Details (% Holdings)</label>
+                    <textarea id="ownershipDetails" placeholder="Board of Directors, State Owned Enterprises, Country holdings..." rows="3"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="tierLevel">Supplier Tier</label>
+                    <select id="tierLevel">
+                        <option value="1">Tier 1 (Direct)</option>
+                        <option value="2">Tier 2</option>
+                        <option value="3">Tier 3</option>
+                        <option value="4">Tier 4</option>
+                    </select>
+                </div>
+                <!-- NEW: Geopolitical Risk Assessment -->
+                <div class="input-group">
+                    <label for="geopoliticalRisk">Geopolitical Risk Level</label>
+                    <select id="geopoliticalRisk">
+                        <option value="low">🟢 Low Risk</option>
+                        <option value="medium">🟡 Medium Risk</option>
+                        <option value="high">🟠 High Risk</option>
+                        <option value="critical">🔴 Critical Risk</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addSupplier()">➕ Add Supplier with AI Verification</button>
+            </div>
+        </div>
+
+        <!-- NEW: AI Insights Panel -->
+        <div class="card full-width">
+            <div class="ai-insights">
+                <h2>🤖 AI-Powered Predictive Insights</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="predictive-analytics">
+                        <h4>📈 Demand Forecasting</h4>
+                        <p>AI predicts 23% increase in electronics demand next quarter</p>
+                        <div style="background: #4CAF50; height: 8px; border-radius: 4px; width: 75%; margin-top: 10px;"></div>
+                    </div>
+                    <div class="predictive-analytics">
+                        <h4>⚠️ Risk Prediction</h4>
+                        <p>Potential disruption detected in Tier 3 suppliers (China region)</p>
+                        <div style="background: #f44336; height: 8px; border-radius: 4px; width: 85%; margin-top: 10px;"></div>
+                    </div>
+                    <div class="predictive-analytics">
+                        <h4>💰 Cost Optimization</h4>
+                        <p>Alternative sourcing could reduce costs by 15%</p>
+                        <div style="background: #ff9800; height: 8px; border-radius: 4px; width: 60%; margin-top: 10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('mapping')">🗺️ Supply Chain Mapping</button>
+                <button class="tab" onclick="switchTab('analysis')">📈 Risk Analysis</button>
+                <button class="tab" onclick="switchTab('recommendations')">💡 AI Recommendations</button>
+                <button class="tab" onclick="switchTab('reports')">📋 Advanced Reports</button>
+                <button class="tab" onclick="switchTab('blockchain')">⛓️ Blockchain Verification</button>
+                <button class="tab" onclick="switchTab('sustainability')">🌱 Sustainability</button>
+                <button class="tab" onclick="switchTab('synthetic')">📊 Data Access</button>
+                <button class="tab" onclick="switchTab('contracts')">📋 Contracts</button>
+                <button class="tab" onclick="switchTab('ai-assistant')">🤖 AI Assistant</button>
+                <button class="tab" onclick="switchTab('ml-training')">🧠 ML Training</button>
+            </div>
+
+            <div id="mapping" class="tab-content active">
+                <h2>Multi-Tier Supply Chain Visualization</h2>
+                <div class="supply-chain-map" id="chainMap">
+                    <div class="tier" id="tier1">
+                        <div class="tier-label">Tier 1</div>
+                        <div class="supplier" onclick="showSupplierDetails('Primary Defense Corp', 'India')">
+                            Primary Defense Corp<br><small>India</small>
+                            <div class="blockchain-verification">✓ Blockchain Verified</div>
+                        </div>
+                    </div>
+                    <div class="tier" id="tier2">
+                        <div class="tier-label">Tier 2</div>
+                        <div class="supplier medium-risk" onclick="showSupplierDetails('Electronics Ltd', 'Germany')">
+                            Electronics Ltd<br><small>Germany</small>
+                            <div class="blockchain-verification">⚠ Pending Verification</div>
+                        </div>
+                        <div class="supplier" onclick="showSupplierDetails('Steel Industries', 'India')">
+                            Steel Industries<br><small>India</small>
+                            <div class="blockchain-verification">✓ Blockchain Verified</div>
+                        </div>
+                    </div>
+                    <div class="tier" id="tier3">
+                        <div class="tier-label">Tier 3</div>
+                        <div class="supplier vulnerable" onclick="showSupplierDetails('Rare Metals Co', 'China')">
+                            Rare Metals Co<br><small>China</small>
+                            <div class="blockchain-verification">❌ Verification Failed</div>
+                        </div>
+                        <div class="supplier" onclick="showSupplierDetails('Precision Parts', 'Japan')">
+                            Precision Parts<br><small>Japan</small>
+                            <div class="blockchain-verification">✓ Blockchain Verified</div>
+                        </div>
+                        <div class="supplier medium-risk" onclick="showSupplierDetails('Composite Materials', 'USA')">
+                            Composite Materials<br><small>USA</small>
+                            <div class="blockchain-verification">✓ Blockchain Verified</div>
+                        </div>
+                    </div>
+                    <div class="tier" id="tier4">
+                        <div class="tier-label">Tier 4</div>
+                        <div class="supplier vulnerable" onclick="showSupplierDetails('Mining Corp', 'Congo')">
+                            Mining Corp<br><small>Congo</small>
+                            <div class="blockchain-verification">❌ High Risk Region</div>
+                        </div>
+                        <div class="supplier" onclick="showSupplierDetails('Raw Materials', 'Australia')">
+                            Raw Materials<br><small>Australia</small>
+                            <div class="blockchain-verification">✓ Blockchain Verified</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="analysis" class="tab-content">
+                <h2>Advanced Risk Assessment Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSuppliers">24</div>
+                        <div>Total Suppliers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="highRiskCount">5</div>
+                        <div>High Risk Suppliers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="vulnerableLinks">8</div>
+                        <div>Vulnerable Links</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="riskScore">72%</div>
+                        <div>Overall Risk Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">95%</div>
+                        <div>Blockchain Verified</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">87%</div>
+                        <div>AI Confidence Level</div>
+                    </div>
+                </div>
+                
+                <h3>Overall Supply Chain Risk Level</h3>
+                <div class="risk-meter">
+                    <div class="risk-indicator" id="riskIndicator" style="left: 72%"></div>
+                </div>
+
+                <!-- NEW: Geopolitical Risk Assessment -->
+                <div class="geopolitical-risk">
+                    <h4>🌍 Geopolitical Risk Assessment</h4>
+                    <p><strong>Current Global Tensions:</strong> Medium Impact on Supply Chain</p>
+                    <p><strong>Trade Route Disruptions:</strong> 2 Active Conflicts Affecting Logistics</p>
+                    <p><strong>Sanctions Impact:</strong> 3 Suppliers in Affected Regions</p>
+                </div>
+                
+                <div class="vulnerability-item">
+                    <h4>🚨 Critical AI-Detected Vulnerability</h4>
+                    <p><strong>Supplier:</strong> Rare Metals Co (China) - Tier 3</p>
+                    <p><strong>AI Risk Score:</strong> 94% (Extremely High)</p>
+                    <p><strong>Risk Factors:</strong> Single source dependency, Geopolitical tensions, Supply route vulnerability</p>
+                    <p><strong>Predicted Impact:</strong> Complete production halt within 30 days if disrupted</p>
+                    <p><strong>AI Recommendation:</strong> Immediate diversification required</p>
+                </div>
+                
+                <div class="vulnerability-item">
+                    <h4>⚠️ Medium Risk Identified by AI</h4>
+                    <p><strong>Supplier:</strong> Electronics Ltd (Germany)</p>
+                    <p><strong>AI Risk Score:</strong> 67% (Medium-High)</p>
+                    <p><strong>Risk Factors:</strong> Energy crisis impact, Currency fluctuation, Logistics delays</p>
+                    <p><strong>Predicted Impact:</strong> 15-25% delivery delays possible</p>
+                    <p><strong>AI Recommendation:</strong> Establish backup European suppliers</p>
+                </div>
+            </div>
+
+            <div id="recommendations" class="tab-content">
+                <h2>🤖 AI-Generated Strategic Recommendations</h2>
+                
+                <div class="recommendation-item">
+                    <h4>🎯 Primary AI Recommendation (Confidence: 96%)</h4>
+                    <p><strong>Action:</strong> Immediate diversification of rare earth material suppliers</p>
+                    <p><strong>Alternative Suppliers Identified:</strong> 3 verified options in Australia, Canada, India</p>
+                    <p><strong>Implementation Timeline:</strong> 4-8 months</p>
+                    <p><strong>Predicted Risk Reduction:</strong> 67%</p>
+                    <p><strong>Cost Impact:</strong> +12% initial, -8% long-term savings</p>
+                    <p><strong>AI Confidence:</strong> Very High</p>
+                </div>
+                
+                <div class="recommendation-item">
+                    <h4>💼 Secondary AI Recommendation (Confidence: 89%)</h4>
+                    <p><strong>Strategic Partnership:</strong> Establish tri-nation supply consortium (India-Australia-Japan)</p>
+                    <p><strong>Benefits:</strong> Geographic diversification, Political stability, Cost optimization</p>
+                    <p><strong>Investment Required:</strong> $2.5M initial setup</p>
+                    <p><strong>ROI Timeline:</strong> 18 months</p>
+                    <p><strong>Risk Mitigation:</strong> 45% reduction in geopolitical exposure</p>
+                </div>
+                
+                <div class="recommendation-item">
+                    <h4>🛡️ Advanced Risk Mitigation Strategy</h4>
+                    <p><strong>AI-Optimized Buffer Stock:</strong> Dynamic inventory based on predictive analytics</p>
+                    <p><strong>Smart Monitoring:</strong> IoT sensors + blockchain tracking for real-time visibility</p>
+                    <p><strong>Automated Alerts:</strong> AI-powered early warning system for supply disruptions</p>
+                    <p><strong>Backup Activation:</strong> Automated supplier switching protocols</p>
+                </div>
+
+                <button class="btn" onclick="generateDetailedReport()">📄 Generate AI-Powered Action Plan</button>
+            </div>
+
+            <div id="reports" class="tab-content">
+                <h2>📊 Advanced Supply Chain Analytics & Reports</h2>
+                
+                <div class="input-group">
+                    <label for="reportType">Report Type</label>
+                    <select id="reportType">
+                        <option value="vulnerability">🚨 AI Vulnerability Assessment Report</option>
+                        <option value="supplier">🏭 Comprehensive Supplier Risk Analysis</option>
+                        <option value="alternative">🔄 Alternative Supplier Recommendations</option>
+                        <option value="compliance">📋 Compliance & Ownership Audit Report</option>
+                        <option value="geopolitical">🌍 Geopolitical Risk Assessment</option>
+                        <option value="predictive">🔮 Predictive Analytics Report</option>
+                        <option value="blockchain">⛓️ Blockchain Verification Status</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="reportFormat">Export Format</label>
+                    <select id="reportFormat">
+                        <option value="pdf">📄 Executive PDF Report</option>
+                        <option value="excel">📊 Excel Analytics Dashboard</option>
+                        <option value="json">💾 JSON Data Export</option>
+                        <option value="powerbi">📈 Power BI Integration</option>
+                        <option value="blockchain">⛓️ Blockchain Certificate</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="exportReport()">📊 Generate Advanced Report</button>
+                
+                <div class="results-panel">
+                    <h3>Recent AI Analysis Results</h3>
+                    <div id="recentResults">
+                        <p>• 🤖 AI Analysis: Advanced Radar System - Risk Level: High (Confidence: 94%)</p>
+                        <p>• 🔍 Critical Path Analysis: Tier 3 → Tier 2 → Tier 1 vulnerability chain identified</p>
+                        <p>• 🎯 Alternative suppliers: 7 AI-verified options found across 4 countries</p>
+                        <p>• ⛓️ Blockchain verification: 95% supply chain authenticated</p>
+                        <p>• 🌍 Geopolitical assessment: 3 medium-risk regions identified</p>
+                        <p>• 📈 Predictive model accuracy: 96.7% for next 6 months</p>
+                        <p>• 🔄 Last AI model update: <span id="lastUpdated"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blockchain Verification Tab -->
+            <div id="blockchain" class="tab-content">
+                <h2>⛓️ Blockchain Supply Chain Verification</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="card">
+                        <h3>🔐 Verification Status</h3>
+                        <div style="margin: 15px 0;">
+                            <div class="blockchain-verification" style="background: #4CAF50;">✓ 23 Suppliers Verified</div>
+                            <div class="blockchain-verification" style="background: #ff9800;">⚠ 3 Pending Verification</div>
+                            <div class="blockchain-verification" style="background: #f44336;">❌ 2 Failed Verification</div>
+                        </div>
+                        <button class="btn hover-effect" onclick="initiateBlockchainVerification()">🔍 Initiate New Verification</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📜 Smart Contracts</h3>
+                        <p>• Automated compliance checking</p>
+                        <p>• Real-time payment processing</p>
+                        <p>• Quality assurance protocols</p>
+                        <p>• Delivery confirmation systems</p>
+                        <button class="btn hover-effect" onclick="deploySmartContract()">📋 Deploy New Contract</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🔍 Traceability</h3>
+                        <p>• End-to-end component tracking</p>
+                        <p>• Origin verification</p>
+                        <p>• Quality certifications</p>
+                        <p>• Tamper-proof records</p>
+                        <button class="btn hover-effect" onclick="traceComponent()">🔎 Trace Component</button>
+                    </div>
+                </div>
+                
+                <div class="results-panel">
+                    <h3>📊 Recent Blockchain Activities</h3>
+                    <div class="vulnerability-item" style="border-left-color: #4CAF50;">
+                        <h4>✅ Verification Complete</h4>
+                        <p><strong>Supplier:</strong> Advanced Defense Systems Ltd</p>
+                        <p><strong>Transaction Hash:</strong> 0x9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08</p>
+                        <p><strong>Status:</strong> Verified and Certified</p>
+                    </div>
+                    <div class="vulnerability-item" style="border-left-color: #ff9800;">
+                        <h4>⏳ Pending Verification</h4>
+                        <p><strong>Supplier:</strong> Electronics Ltd (Germany)</p>
+                        <p><strong>Status:</strong> Document review in progress</p>
+                        <p><strong>ETA:</strong> 2 hours</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sustainability Tab -->
+            <div id="sustainability" class="tab-content">
+                <h2>🌱 Sustainability & ESG Assessment</h2>
+                
+                <div class="sustainability-score">
+                    <h3>🌍 Overall Sustainability Score: 78/100</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                        <div>
+                            <h4>♻️ Environmental Impact</h4>
+                            <div style="background: #4CAF50; height: 10px; border-radius: 5px; width: 85%;"></div>
+                            <p>85% - Excellent carbon footprint management</p>
+                        </div>
+                        <div>
+                            <h4>👥 Social Responsibility</h4>
+                            <div style="background: #ff9800; height: 10px; border-radius: 5px; width: 70%;"></div>
+                            <p>70% - Good labor practices, room for improvement</p>
+                        </div>
+                        <div>
+                            <h4>🏛️ Governance</h4>
+                            <div style="background: #4CAF50; height: 10px; border-radius: 5px; width: 90%;"></div>
+                            <p>90% - Excellent transparency and compliance</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <div class="card">
+                        <h3>📊 ESG Analytics</h3>
+                        <button class="btn hover-effect" onclick="generateSustainabilityReport()">🌱 Generate ESG Report</button>
+                        <button class="btn hover-effect" onclick="assessSupplierSustainability()">🏭 Assess Suppliers</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🌍 Carbon Footprint</h3>
+                        <p>Current Emissions: 2,847 tons CO2e/year</p>
+                        <p>Reduction Target: 45% by 2025</p>
+                        <button class="btn hover-effect" onclick="calculateCarbonFootprint()">📊 Calculate Footprint</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>🎯 Sustainability Goals</h3>
+                        <p>• Net Zero by 2030</p>
+                        <p>• 100% Renewable Energy</p>
+                        <p>• Ethical Sourcing Standards</p>
+                        <p>• Circular Economy Principles</p>
+                    </div>
+                </div>
+                
+                <div class="recommendation-item">
+                    <h4>🎯 Sustainability Recommendations</h4>
+                    <p>• Prioritize suppliers with renewable energy usage</p>
+                    <p>• Implement carbon offset programs for high-emission suppliers</p>
+                    <p>• Establish ethical sourcing standards for conflict minerals</p>
+                    <p>• Create supplier sustainability scorecards</p>
+                </div>
+                
+                <div class="results-panel">
+                    <h3>📈 Sustainability Metrics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">78</div>
+                            <div>ESG Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">67%</div>
+                            <div>Renewable Energy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">23%</div>
+                            <div>Carbon Reduction</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">12</div>
+                            <div>High ESG Suppliers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Synthetic Data Access Tab -->
+            <div id="synthetic" class="tab-content">
+                <h2>📊 Synthetic Dataset Access</h2>
+                <div class="access-steps">
+                    <h3>🔐 Access Steps for Synthetic Data:</h3>
+                    <p><strong>Step 1:</strong> Verify admin credentials (admin/admin@admin.com)</p>
+                    <p><strong>Step 2:</strong> Complete security verification</p>
+                    <p><strong>Step 3:</strong> Request data access token</p>
+                    <p><strong>Step 4:</strong> Authenticate with Gemini AI</p>
+                    <p><strong>Step 5:</strong> Access granted to synthetic datasets</p>
+                </div>
+                <button class="btn hover-effect" onclick="requestDataAccess()">🔑 Request Data Access</button>
+                <div id="syntheticDataContent" style="display: none;">
+                    <div class="synthetic-data-panel">
+                        <h3>🎲 Generated Supply Chain Data</h3>
+                        <div class="data-sample">
+                            <strong>Supplier Dataset (Sample):</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"supplier_id": "SUP_001",<br>
+                            &nbsp;&nbsp;"name": "Advanced Defense Systems Ltd",<br>
+                            &nbsp;&nbsp;"country": "India",<br>
+                            &nbsp;&nbsp;"tier": 1,<br>
+                            &nbsp;&nbsp;"risk_score": 0.23,<br>
+                            &nbsp;&nbsp;"reliability": 0.94,<br>
+                            &nbsp;&nbsp;"certifications": ["ISO 9001", "AS9100"],<br>
+                            &nbsp;&nbsp;"annual_revenue": 750000000,<br>
+                            &nbsp;&nbsp;"employees": 8500<br>
+                            }
+                        </div>
+                        <button class="btn hover-effect" onclick="generateSyntheticData()">🎲 Generate New Dataset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: Contract Templates Tab -->
+            <div id="contracts" class="tab-content">
+                <h2>📋 Sample Contract Templates</h2>
+                <div class="contract-sample">
+                    <h4>🏭 SUPPLY CHAIN AGREEMENT TEMPLATE</h4>
+                    <p><strong>AGREEMENT NO:</strong> SCA-2024-001</p>
+                    <p><strong>PARTIES:</strong> LinkGuard Systems (Buyer) & [Supplier Name] (Seller)</p>
+                    <p><strong>EFFECTIVE DATE:</strong> [Date]</p>
+                    <br>
+                    <p><strong>ARTICLE 1: SUPPLY REQUIREMENTS</strong></p>
+                    <p>1.1 The Supplier agrees to provide [Component/Equipment] as per specifications outlined in Annexure A.</p>
+                    <p>1.2 Quality standards must meet or exceed ISO 9001:2015 requirements.</p>
+                    <p>1.3 All deliveries must include blockchain verification certificates.</p>
+                </div>
+                <button class="btn hover-effect" onclick="generateContract()">📄 Generate Custom Contract</button>
+            </div>
+
+            <!-- NEW: AI Assistant Tab -->
+            <div id="ai-assistant" class="tab-content">
+                <h2>🤖 AI Assistant Integration</h2>
+                <div class="synthetic-data-panel">
+                    <h3>🧠 AI Assistant Capabilities</h3>
+                    <p>• Real-time supply chain risk assessment</p>
+                    <p>• Predictive analytics and forecasting</p>
+                    <p>• Alternative supplier recommendations</p>
+                    <p>• Compliance monitoring and alerts</p>
+                    <p>• Natural language query processing</p>
+                    <br>
+                    <div class="input-group">
+                        <label for="aiQuery">Ask AI Assistant:</label>
+                        <input type="text" id="aiQuery" placeholder="e.g., What are the risks for Tier 2 suppliers?" class="hover-effect">
+                    </div>
+                    <button class="btn hover-effect" onclick="queryAI()">🤖 Ask AI</button>
+                    <div id="aiResponse" style="margin-top: 20px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px; display: none;"></div>
+                </div>
+            </div>
+
+            <!-- ML Training Tab -->
+            <div id="ml-training" class="tab-content">
+                <h2>🧠 Machine Learning Model Training</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card">
+                        <h3>📊 Model Selection</h3>
+                        <div class="input-group">
+                            <label for="modelType">Select ML Model:</label>
+                            <select id="modelType" class="hover-effect">
+                                <option value="random_forest">Random Forest (Best for Risk Prediction)</option>
+                                <option value="xgboost">XGBoost (Best Overall Performance)</option>
+                                <option value="neural_network">Neural Network (Best for Complex Patterns)</option>
+                            </select>
+                        </div>
+                        <button class="btn hover-effect" onclick="trainModel()">🚀 Start Training</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>📈 Model Performance</h3>
+                        <div id="modelMetrics" style="display: none;">
+                            <div class="stat-card">
+                                <div class="stat-value" id="accuracy">94.7%</div>
+                                <div>Accuracy</div>
+                            </div>
+                        </div>
+                        <canvas id="performanceChart" width="300" height="200" style="display: none; background: rgba(255,255,255,0.1); border-radius: 10px;"></canvas>
+                    </div>
+                </div>
+                
+                <div class="results-panel">
+                    <h3>📊 Training Results</h3>
+                    <div id="trainingResults" style="display: none;">
+                        <canvas id="trainingChart" width="600" height="300" style="background: rgba(255,255,255,0.1); border-radius: 10px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant Panel -->
+    <div id="aiAssistantPanel" class="ai-assistant-panel">
+        <div class="ai-assistant-header">
+            🤖 LinkGuard AI Assistant
+            <button onclick="toggleAIAssistant()" style="float: right; background: none; border: none; color: black; font-size: 18px; cursor: pointer;">×</button>
+        </div>
+        <div class="ai-chat-area" id="aiChatArea">
+            <div style="color: #00ff00; margin-bottom: 10px;">
+                🤖 AI: Hello! I'm your LinkGuard AI Assistant. I can help you with supply chain analysis, risk assessment, and strategic recommendations. How can I assist you today?
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" class="ai-input" id="aiChatInput" placeholder="Type your question..." onkeypress="handleAIChatEnter(event)">
+            <button onclick="sendAIMessage()" style="width: 100%; margin-top: 10px; padding: 8px; background: #00ff00; color: black; border: none; border-radius: 5px; cursor: pointer;">Send</button>
+        </div>
+    </div>
+
+    <!-- AI Toggle Button -->
+    <button id="aiToggleBtn" class="ai-toggle-btn" onclick="toggleAIAssistant()">🤖</button>
+
+    <!-- Execution Overlay -->
+    <div id="executionOverlay" class="execution-overlay">
+        <div class="execution-content">
+            <div class="execution-text" id="executionText">AI PROCESSING SUPPLY CHAIN DATA...</div>
+            <div class="ai-processing">
+                <div class="ai-processing-text">🤖 AI ANALYZING</div>
+                <div class="processing-dots">
+                    <div class="processing-dot"></div>
+                    <div class="processing-dot"></div>
+                    <div class="processing-dot"></div>
+                </div>
+            </div>
+            <div class="execution-buttons" id="executionButtons" style="display: none;">
+                <button class="execution-btn" onclick="saveResults()">💾 SAVE</button>
+                <button class="execution-btn" onclick="exitExecution()">🚪 EXIT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="developer-info">Developed by GaneshPrabu</div>
+        <div class="developer-contact">+91-7338703622 | ganeshprabu.bo2024@sece.ac.in</div>
+    </div>
+
+    <!-- Modal for Supplier Details -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>🏭 Advanced Supplier Intelligence</h2>
+            <div id="supplierDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const GEMINI_API_KEY = 'AIzaSyB1HGu5UDHnkklxIbEiadIGCduy62uc8uc';
+        
+        // Synthetic datasets (protected)
+        const syntheticSuppliers = [
+            {id: "SUP_001", name: "Advanced Defense Systems Ltd", country: "India", tier: 1, risk_score: 0.23, reliability: 0.94},
+            {id: "SUP_002", name: "Precision Electronics Corp", country: "Germany", tier: 2, risk_score: 0.45, reliability: 0.87},
+            {id: "SUP_003", name: "Rare Earth Mining Co", country: "China", tier: 3, risk_score: 0.78, reliability: 0.56}
+        ];
+
+        // Initialize timestamp
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const timestamp = now.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const lastUpdatedElement = document.getElementById('lastUpdated');
+            if (lastUpdatedElement) {
+                lastUpdatedElement.textContent = timestamp;
+            }
+
+            // Add hover effects
+            const hoverElements = document.querySelectorAll('.hover-effect');
+            hoverElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+
+        function login() {
+            const userType = document.getElementById('userType').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if ((userType === 'admin' && username === 'Linkguardadmin' && email === 'ganeshprabu2025@linkguard.com' && password === 'prabu@linkguard') ||
+                (userType !== 'admin' && username && email && password)) {
+                
+                showExecutionOverlay('AUTHENTICATING USER CREDENTIALS...', () => {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('dashboardPage').classList.remove('hidden');
+                    alert(`🎉 Welcome ${username}!\n\n✅ Secure login successful as ${userType}\n🤖 AI systems initialized\n⛓️ Blockchain connection established\n📊 Real-time monitoring active`);
+                });
+            } else {
+                alert('🔒 Authentication Failed!\n\nFor admin access use:\nUsername: Linkguardadmin\nEmail: ganeshprabu2025@linkguard.com\nPassword: prabu@linkguard');
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function registerEquipment() {
+            const equipmentName = document.getElementById('equipmentName').value;
+            const equipmentType = document.getElementById('equipmentType').value;
+            const criticalityLevel = document.getElementById('criticalityLevel').value;
+            const aiRiskPrediction = document.getElementById('aiRiskPrediction').value;
+            
+            if (equipmentName && equipmentType) {
+                showExecutionOverlay('EXECUTING AI SUPPLY CHAIN ANALYSIS...', () => {
+                    const reportData = {
+                        equipment: equipmentName,
+                        type: equipmentType,
+                        criticality: criticalityLevel,
+                        analysis: aiRiskPrediction,
+                        suppliers: 24,
+                        highRisk: 3,
+                        alternatives: 15
+                    };
+                    
+                    alert(`🤖 AI-Powered Analysis Complete!\n\n📋 Equipment: "${equipmentName}"\n🔧 Type: ${equipmentType}\n⚠️ Criticality: ${criticalityLevel}\n🧠 AI Analysis: ${aiRiskPrediction}\n\n✅ Supply chain mapping initiated\n🔍 24 suppliers identified across 4 tiers\n⚠️ 3 high-risk dependencies detected\n💡 Alternative sourcing options generated\n\nCheck the mapping tab for detailed visualization.`);
+                    
+                    showDownloadPopup('AI Supply Chain Analysis', reportData);
+                    switchTab('mapping');
+                });
+            } else {
+                alert('⚠️ Please fill in all required fields for AI analysis.');
+            }
+        }
+
+        function addSupplier() {
+            const supplierName = document.getElementById('supplierName').value;
+            const supplierCountry = document.getElementById('supplierCountry').value;
+            const ownershipDetails = document.getElementById('ownershipDetails').value;
+            const tierLevel = document.getElementById('tierLevel').value;
+            const geopoliticalRisk = document.getElementById('geopoliticalRisk').value;
+            
+            if (supplierName && supplierCountry) {
+                showExecutionOverlay('PROCESSING SUPPLIER INTELLIGENCE...', () => {
+                    alert(`🏭 Supplier Intelligence Update Complete!\n\n✅ Supplier: "${supplierName}" (${supplierCountry})\n🏢 Tier Level: ${tierLevel}\n🌍 Geopolitical Risk: ${geopoliticalRisk}\n📋 Ownership: ${ownershipDetails || 'Not specified'}\n\n🤖 AI Verification: Completed\n⛓️ Blockchain Registration: Initiated\n📊 Risk Assessment: Generated\n🔍 Background Check: In Progress\n\nSupplier successfully integrated into supply chain network.`);
+                    
+                    document.getElementById('supplierName').value = '';
+                    document.getElementById('supplierCountry').value = '';
+                    document.getElementById('ownershipDetails').value = '';
+                });
+            } else {
+                alert('⚠️ Please provide supplier name and country for AI verification.');
+            }
+        }
+
+        function showSupplierDetails(name, country) {
+            const modal = document.getElementById('supplierModal');
+            const details = document.getElementById('supplierDetails');
+            
+            const supplierInfo = {
+                'Primary Defense Corp': {
+                    risk: 'Low',
+                    reliability: '98%',
+                    revenue: '$750M',
+                    employees: '8,500',
+                    certifications: 'ISO 9001, AS9100, CMMI Level 5',
+                    blockchain: 'Verified',
+                    sustainability: '92/100',
+                    aiScore: '96%'
+                },
+                'Rare Metals Co': {
+                    risk: 'Critical',
+                    reliability: '45%',
+                    revenue: '$180M',
+                    employees: '900',
+                    certifications: 'ISO 14001 (Expired)',
+                    blockchain: 'Failed Verification',
+                    sustainability: '23/100',
+                    aiScore: '12%'
+                },
+                'Electronics Ltd': {
+                    risk: 'Medium',
+                    reliability: '82%',
+                    revenue: '$420M',
+                    employees: '3,200',
+                    certifications: 'ISO 9001, IEC 61508, RoHS',
+                    blockchain: 'Pending Verification',
+                    sustainability: '78/100',
+                    aiScore: '87%'
+                }
+            };
+            
+            const info = supplierInfo[name] || {
+                risk: 'Medium',
+                reliability: '75%',
+                revenue: '$200M',
+                employees: '1,500',
+                certifications: 'ISO 9001',
+                blockchain: 'Verified',
+                sustainability: '65/100',
+                aiScore: '78%'
+            };
+            
+            details.innerHTML = `
+                <h3>🏭 ${name}</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                    <div>
+                        <p><strong>🌍 Country:</strong> ${country}</p>
+                        <p><strong>⚠️ Risk Level:</strong> ${info.risk}</p>
+                        <p><strong>📊 Reliability Score:</strong> ${info.reliability}</p>
+                        <p><strong>💰 Annual Revenue:</strong> ${info.revenue}</p>
+                        <p><strong>👥 Employees:</strong> ${info.employees}</p>
+                    </div>
+                    <div>
+                        <p><strong>📜 Certifications:</strong> ${info.certifications}</p>
+                        <p><strong>⛓️ Blockchain Status:</strong> ${info.blockchain}</p>
+                        <p><strong>🌱 Sustainability Score:</strong> ${info.sustainability}</p>
+                        <p><strong>🤖 AI Confidence:</strong> ${info.aiScore}</p>
+                    </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <button class="btn" onclick="initiateAudit('${name}')">🔍 Initiate AI Audit</button>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('supplierModal').style.display = 'none';
+        }
+
+        function generateDetailedReport() {
+            showExecutionOverlay('GENERATING AI-POWERED STRATEGIC REPORT...', () => {
+                const reportData = {
+                    pages: 47,
+                    recommendations: 23,
+                    alternatives: 15,
+                    scenarios: 8,
+                    accuracy: 96
+                };
+                
+                alert(`🤖 AI-Powered Strategic Action Plan Generated!\n\n📋 Comprehensive Report Contents:\n• Executive Summary with AI Insights\n• Risk Assessment Matrix (96% accuracy)\n• Supplier Diversification Strategy\n• Geopolitical Impact Analysis\n• Blockchain Implementation Roadmap\n• Sustainability Integration Plan\n• Predictive Analytics Dashboard\n• Cost-Benefit Analysis\n• Implementation Timeline & Milestones\n• ROI Projections\n\n📊 Report Statistics:\n• Pages: 47\n• AI Recommendations: 23\n• Alternative Suppliers: 15\n• Risk Scenarios: 8\n\n💾 Report saved with blockchain hash verification\n📧 Executive summary sent to stakeholders`);
+                
+                showDownloadPopup('Strategic Action Plan', reportData);
+            });
+        }
+
+        function exportReport() {
+            const reportType = document.getElementById('reportType').value;
+            const reportFormat = document.getElementById('reportFormat').value;
+            
+            showExecutionOverlay('EXPORTING ADVANCED ANALYTICS REPORT...', () => {
+                const reportData = {
+                    type: reportType,
+                    format: reportFormat,
+                    size: '4.7 MB',
+                    pages: 28,
+                    confidence: 94.7
+                };
+                
+                alert(`📊 Advanced ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report Generated!\n\n📄 Format: ${reportFormat.toUpperCase()}\n💾 File Size: 4.7 MB\n📑 Pages: 28\n🤖 AI Analysis Confidence: 94.7%\n\n📈 Report Features:\n• Interactive dashboards\n• Predictive analytics charts\n• Risk heat maps\n• Supplier performance metrics\n• Blockchain verification status\n• Sustainability scorecards\n• Geopolitical risk assessment\n• Cost optimization recommendations\n\n⛓️ Blockchain certificate generated\n🔐 Report digitally signed and encrypted\n📧 Secure download link sent to authorized users`);
+                
+                const reportName = reportType.charAt(0).toUpperCase() + reportType.slice(1) + ' Report';
+                showDownloadPopup(reportName, reportData);
+            });
+        }
+
+        function initiateBlockchainVerification() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert(`⛓️ Blockchain Verification Initiated!\n\n🔍 Verification Process:\n• Smart contract deployment: ✅ Complete\n• Supplier identity verification: 🔄 In Progress\n• Document authenticity check: 🔄 In Progress\n• Compliance validation: ⏳ Queued\n• Certificate generation: ⏳ Queued\n\n📊 Current Status:\n• Verified Suppliers: 23/28\n• Pending Verification: 3\n• Failed Verification: 2\n\n⏱️ Estimated completion: 15 minutes\n📧 Notifications will be sent upon completion`);
+            }, 2000);
+        }
+
+        function deploySmartContract() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert(`📋 Smart Contract Deployment Successful!\n\n⛓️ Contract Details:\n• Contract Address: 0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2\n• Gas Used: 2,847,392\n• Transaction Hash: 0x9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\n\n🔧 Automated Features Enabled:\n• Quality assurance protocols\n• Payment processing\n• Delivery confirmation\n• Compliance monitoring\n• Dispute resolution\n\n✅ Contract successfully deployed on blockchain\n🔐 Multi-signature security enabled\n📊 Real-time monitoring activated`);
+            }, 2500);
+        }
+
+        function traceComponent() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert(`🔎 Component Traceability Analysis Complete!\n\n📦 Component: Advanced Radar Module\n🏭 Origin: Precision Parts (Japan)\n📅 Manufacturing Date: 2024-01-15\n\n🛤️ Supply Chain Journey:\n1. Raw Materials (Australia) ✅ Verified\n2. Component Manufacturing (Japan) ✅ Verified\n3. Quality Testing (Singapore) ✅ Verified\n4. Assembly (India) ✅ Verified\n5. Final Integration (Current Location) 🔄 In Progress\n\n⛓️ Blockchain Records: 47 transactions\n🔐 Tamper-proof: All records verified\n📜 Certifications: ISO 9001, RoHS, CE\n🌱 Carbon Footprint: 2.3 kg CO2e`);
+            }, 2000);
+        }
+
+        function generateSustainabilityReport() {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert(`🌱 ESG Sustainability Report Generated!\n\n📊 Overall Score: 78/100 (Good)\n\n🌍 Environmental (85/100):\n• Carbon footprint reduction: 23%\n• Renewable energy usage: 67%\n• Waste reduction: 45%\n• Water conservation: 78%\n\n👥 Social (70/100):\n• Labor practices: Good\n• Community impact: Moderate\n• Diversity & inclusion: 65%\n• Safety standards: Excellent\n\n🏛️ Governance (90/100):\n• Transparency: Excellent\n• Compliance: 98%\n• Ethics standards: High\n• Risk management: Robust\n\n💡 Key Recommendations:\n• Increase renewable energy to 80%\n• Improve supplier diversity programs\n• Implement carbon offset initiatives\n• Enhance community engagement`);
+            }, 2500);
+        }
+
+        function initiateAudit(supplierName) {
+            showLoading();
+            setTimeout(() => {
+                hideLoading();
+                alert(`🔍 AI-Powered Audit Initiated for ${supplierName}\n\n🤖 Audit Components:\n• Financial stability analysis\n• Operational capacity assessment\n• Compliance verification\n• Risk factor evaluation\n• Blockchain verification\n• Sustainability scoring\n\n⏱️ Estimated completion: 24 hours\n📧 Detailed report will be sent upon completion\n🔔 Real-time updates available in dashboard`);
+                closeModal();
+            }, 1500);
+        }
+
+        // New enhanced functions
+        function requestDataAccess() {
+            showExecutionOverlay('VERIFYING SECURITY CREDENTIALS...', () => {
+                document.getElementById('syntheticDataContent').style.display = 'block';
+                alert('🔑 Data Access Granted!\n\n✅ Security verification complete\n🤖 AI authentication successful\n📊 Synthetic datasets now available\n⛓️ Blockchain verification active');
+            });
+        }
+
+        function generateSyntheticData() {
+            showExecutionOverlay('GENERATING SYNTHETIC DATASET...', () => {
+                const randomSupplier = syntheticSuppliers[Math.floor(Math.random() * syntheticSuppliers.length)];
+                alert(`🎲 New Synthetic Dataset Generated!\n\n🏭 Supplier: ${randomSupplier.name}\n🌍 Country: ${randomSupplier.country}\n📊 Risk Score: ${randomSupplier.risk_score}\n🔧 Reliability: ${randomSupplier.reliability}\n\nDataset ready for ML training and analysis.`);
+            });
+        }
+
+        function generateContract() {
+            showExecutionOverlay('GENERATING SMART CONTRACT...', () => {
+                const contractId = 'SCA-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                alert(`📄 Smart Contract Generated!\n\n📋 Contract ID: ${contractId}\n⛓️ Blockchain Address: 0x${Math.random().toString(16).substr(2, 40)}\n🔐 Multi-signature enabled\n📊 Automated compliance monitoring\n✅ Ready for deployment`);
+            });
+        }
+
+        function queryAI() {
+            const query = document.getElementById('aiQuery').value;
+            if (query) {
+                showExecutionOverlay('AI PROCESSING YOUR QUERY...', () => {
+                    const response = generateAIResponse(query);
+                    document.getElementById('aiResponse').innerHTML = `<strong>🤖 AI Response:</strong><br>${response}`;
+                    document.getElementById('aiResponse').style.display = 'block';
+                    document.getElementById('aiQuery').value = '';
+                });
+            }
+        }
+
+        function generateAIResponse(query) {
+            const responses = [
+                "Based on current analysis, Tier 2 suppliers show 23% higher risk due to geopolitical tensions. Recommend diversification strategy.",
+                "AI predicts 15% supply disruption probability in next 30 days. Alternative suppliers identified in Australia and Canada.",
+                "Risk assessment complete: 8 high-risk suppliers detected. Blockchain verification recommended for critical components.",
+                "Cost optimization potential: 18% savings possible through strategic supplier consolidation and route optimization."
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function toggleAIAssistant() {
+            const panel = document.getElementById('aiAssistantPanel');
+            const btn = document.getElementById('aiToggleBtn');
+            
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+                btn.style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiChatInput');
+            const chatArea = document.getElementById('aiChatArea');
+            const message = input.value.trim();
+            
+            if (message) {
+                chatArea.innerHTML += `<div style="margin: 10px 0; color: #fff;">👤 You: ${message}</div>`;
+                
+                setTimeout(() => {
+                    const aiResponse = generateAIResponse(message);
+                    chatArea.innerHTML += `<div style="margin: 10px 0; color: #00ff00;">🤖 AI: ${aiResponse}</div>`;
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 1000);
+                
+                input.value = '';
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        }
+
+        function handleAIChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendAIMessage();
+            }
+        }
+
+        // ML Training Functions
+        function trainModel() {
+            const modelType = document.getElementById('modelType').value;
+            
+            showExecutionOverlay('TRAINING ML MODEL...', () => {
+                const results = simulateTraining(modelType);
+                displayTrainingResults(results);
+                
+                alert(`🧠 ML Model Training Complete!\n\n📊 Model: ${modelType.replace('_', ' ').toUpperCase()}\n🎯 Accuracy: ${results.accuracy}%\n✅ Model ready for deployment`);
+                
+                showDownloadPopup('ML Training Report', results);
+            });
+        }
+
+        function simulateTraining(modelType) {
+            const modelPerformance = {
+                'random_forest': { accuracy: 94.7, precision: 92.3 },
+                'xgboost': { accuracy: 96.2, precision: 94.8 },
+                'neural_network': { accuracy: 91.8, precision: 89.4 }
+            };
+            
+            return modelPerformance[modelType];
+        }
+
+        function displayTrainingResults(results) {
+            document.getElementById('modelMetrics').style.display = 'block';
+            document.getElementById('accuracy').textContent = results.accuracy + '%';
+            
+            document.getElementById('trainingResults').style.display = 'block';
+            
+            drawTrainingChart(results);
+        }
+
+        function drawTrainingChart(results) {
+            const canvas = document.getElementById('trainingChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw training progress line
+            const epochs = 20;
+            ctx.strokeStyle = '#4CAF50';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            for (let i = 0; i < epochs; i++) {
+                const x = 50 + (i / (epochs - 1)) * (canvas.width - 100);
+                const y = canvas.height - 50 - (i / epochs) * (canvas.height - 100);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // Add labels
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Training Progress', canvas.width / 2, canvas.height - 10);
+            ctx.fillText(`Final Accuracy: ${results.accuracy}%`, canvas.width / 2, 30);
+        }
+
+        function showExecutionOverlay(text, callback) {
+            const overlay = document.getElementById('executionOverlay');
+            const executionText = document.getElementById('executionText');
+            const buttons = document.getElementById('executionButtons');
+            
+            executionText.textContent = text;
+            overlay.style.display = 'flex';
+            buttons.style.display = 'none';
+            
+            setTimeout(() => {
+                buttons.style.display = 'block';
+                window.currentCallback = callback;
+            }, 3000);
+        }
+
+        function saveResults() {
+            if (window.currentCallback) {
+                window.currentCallback();
+            }
+            exitExecution();
+        }
+
+        function exitExecution() {
+            document.getElementById('executionOverlay').style.display = 'none';
+        }
+
+        function showDownloadPopup(reportType, reportData) {
+            const popup = document.createElement('div');
+            popup.className = 'download-popup';
+            popup.innerHTML = `
+                <h3 style="color: #ffd700; margin-bottom: 20px;">📊 Download Report</h3>
+                <p style="margin-bottom: 20px;">Report: ${reportType}</p>
+                <div style="text-align: center;">
+                    <button class="download-btn" onclick="downloadReport('${reportType}', 'pdf')">
+                        📄 Download PDF
+                    </button>
+                    <button class="download-btn" onclick="downloadReport('${reportType}', 'excel')">
+                        📊 Download Excel
+                    </button>
+                    <button class="download-btn" onclick="downloadReport('${reportType}', 'json')">
+                        💾 Download JSON
+                    </button>
+                    <button class="download-btn" onclick="closeDownloadPopup()" style="background: #f44336;">
+                        ❌ Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            popup.style.display = 'block';
+            window.currentReportData = reportData;
+        }
+
+        function closeDownloadPopup() {
+            const popup = document.querySelector('.download-popup');
+            if (popup) popup.remove();
+        }
+
+        function downloadReport(reportType, format) {
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            let filename, content, mimeType;
+            
+            if (format === 'pdf') {
+                filename = `LinkGuard_${reportType.replace(/\s+/g, '_')}_${timestamp}.txt`;
+                content = generateReportContent(reportType, 'text');
+                mimeType = 'text/plain';
+            } else if (format === 'excel') {
+                filename = `LinkGuard_${reportType.replace(/\s+/g, '_')}_${timestamp}.csv`;
+                content = generateCSVContent(reportType);
+                mimeType = 'text/csv';
+            } else {
+                filename = `LinkGuard_${reportType.replace(/\s+/g, '_')}_${timestamp}.json`;
+                content = generateReportContent(reportType, 'json');
+                mimeType = 'application/json';
+            }
+            
+            const blob = new Blob([content], { type: mimeType });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            closeDownloadPopup();
+            alert(`📥 Report Downloaded Successfully!\n\nFile: ${filename}\nFormat: ${format.toUpperCase()}\nSize: ${(blob.size / 1024).toFixed(2)} KB\n\nNote: PDF downloaded as readable text file`);
+        }
+
+        function generateCSVContent(reportType) {
+            const header = `LinkGuard AI Supply Chain Intelligence Report\nReport Type: ${reportType}\nGenerated: ${new Date().toLocaleString()}\n\n`;
+            
+            const csvData = [
+                ['Metric', 'Value', 'Status'],
+                ['Total Suppliers', '28', 'Active'],
+                ['High Risk', '8', 'Critical'],
+                ['Medium Risk', '12', 'Monitor'],
+                ['Low Risk', '8', 'Good'],
+                ['AI Confidence', '94.7%', 'High'],
+                ['Blockchain Verified', '89%', 'Good'],
+                ['ESG Score', '78/100', 'Good']
+            ];
+            
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+            return header + csvContent;
+        }
+
+        function generateReportContent(reportType, format) {
+            const header = `
+╔══════════════════════════════════════════════════════════════╗
+║                         LINKGUARD                           ║
+║           AI-Powered Supply Chain Intelligence              ║
+║        Advanced Multi-Tier Risk Analytics Platform         ║
+╚══════════════════════════════════════════════════════════════╝
+
+Report Type: ${reportType}
+Generated: ${new Date().toLocaleString()}
+System: LinkGuard AI v2.0
+Developed by: GaneshPrabu (+91-7338703622)
+
+${'='.repeat(65)}
+`;
+
+            if (format === 'json') {
+                return JSON.stringify({
+                    system: "LinkGuard AI Supply Chain Intelligence",
+                    tagline: "Advanced Multi-Tier Risk Analytics Platform",
+                    reportType: reportType,
+                    timestamp: new Date().toISOString(),
+                    developer: "GaneshPrabu (+91-7338703622)",
+                    data: window.currentReportData || getReportData(reportType)
+                }, null, 2);
+            }
+
+            return header + getReportContent(reportType);
+        }
+
+        function getReportContent(reportType) {
+            const reports = {
+                'AI Supply Chain Analysis': `
+SUPPLY CHAIN ANALYSIS REPORT
+${'='.repeat(30)}
+
+📊 EXECUTIVE SUMMARY:
+• Total Suppliers Analyzed: 28
+• High Risk Suppliers: 8 (29%)
+• Medium Risk: 12 (43%)
+• Low Risk: 8 (28%)
+• AI Confidence Level: 94.7%
+
+🔍 KEY FINDINGS:
+• Critical vulnerability in Tier 3 suppliers
+• Geopolitical risks affecting 15% of supply chain
+• Alternative suppliers identified: 23
+• Blockchain verification coverage: 89%
+
+💡 AI RECOMMENDATIONS:
+• Immediate diversification of rare earth suppliers
+• Establish tri-nation supply consortium
+• Implement dynamic inventory management
+• Deploy automated risk monitoring
+
+📈 RISK METRICS:
+• Overall Risk Score: 72%
+• Supply Disruption Probability: 15%
+• Cost Optimization Potential: 18%
+• Compliance Rating: 96%`,
+
+                'Blockchain Verification Report': `
+BLOCKCHAIN VERIFICATION REPORT
+${'='.repeat(32)}
+
+⛓️ VERIFICATION STATUS:
+• Total Suppliers: 28
+• Verified: 23 (82%)
+• Pending: 3 (11%)
+• Failed: 2 (7%)
+
+🔐 SMART CONTRACTS:
+• Active Contracts: 15
+• Automated Compliance: 98%
+• Transaction Volume: 2,847
+• Gas Efficiency: 94%
+
+📋 RECENT ACTIVITIES:
+• Contract Deployments: 5
+• Verification Completions: 12
+• Failed Verifications: 2
+• Pending Reviews: 3
+
+🎯 RECOMMENDATIONS:
+• Complete pending verifications
+• Upgrade failed suppliers
+• Implement multi-sig protocols
+• Enhance automated monitoring`,
+
+                'ML Training Report': `
+MACHINE LEARNING TRAINING REPORT
+${'='.repeat(35)}
+
+🧠 MODEL TRAINING SUMMARY:
+• Model Type: Advanced ML Algorithm
+• Training Dataset: Supply Chain Risk Data
+• Training Samples: 10,000+ records
+• Accuracy: 96.2%
+• Precision: 94.8%
+
+🎯 DEPLOYMENT READINESS:
+• Model Validation: Passed
+• Performance Benchmarks: Exceeded
+• Production Ready: Yes`,
+
+                'Sustainability Assessment': `
+SUSTAINABILITY ASSESSMENT REPORT
+${'='.repeat(34)}
+
+🌱 ESG OVERVIEW:
+• Overall Score: 78/100
+• Environmental: 85/100
+• Social: 70/100
+• Governance: 90/100
+
+🌍 CARBON FOOTPRINT:
+• Total Emissions: 2,847 tons CO2e/year
+• Tier 1: 1,245 tons (44%)
+• Tier 2: 892 tons (31%)
+• Tier 3: 567 tons (20%)
+• Transportation: 143 tons (5%)
+
+📊 SUPPLIER PERFORMANCE:
+• High ESG Score (80+): 12 suppliers
+• Medium Score (60-79): 11 suppliers
+• Low Score (<60): 5 suppliers
+
+🎯 IMPROVEMENT TARGETS:
+• Renewable Energy: 80% by 2025
+• Carbon Reduction: 45% by 2030
+• Supplier Diversity: 30% increase
+• Ethical Sourcing: 100% compliance`
+            };
+
+            return reports[reportType] || `
+${reportType.toUpperCase()} REPORT
+${'='.repeat(reportType.length + 7)}
+
+Report generated successfully.
+Detailed analysis and recommendations included.
+For more information, contact LinkGuard support.`;
+        }
+
+        function getReportData(reportType) {
+            return {
+                suppliers: 28,
+                riskLevel: "Medium-High",
+                confidence: 94.7,
+                recommendations: 15,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // Blockchain Verification Functions
+        function initiateBlockchainVerification() {
+            showExecutionOverlay('INITIATING BLOCKCHAIN VERIFICATION...', () => {
+                const reportData = {
+                    verified: 23,
+                    pending: 3,
+                    failed: 2,
+                    total: 28,
+                    completion: '15 minutes'
+                };
+                
+                alert(`⛓️ Blockchain Verification Initiated!\n\n🔍 Verification Process:\n• Smart contract deployment: ✅ Complete\n• Supplier identity verification: 🔄 In Progress\n• Document authenticity check: 🔄 In Progress\n• Compliance validation: ⏳ Queued\n• Certificate generation: ⏳ Queued\n\n📊 Current Status:\n• Verified Suppliers: 23/28\n• Pending Verification: 3\n• Failed Verification: 2\n\n⏱️ Estimated completion: 15 minutes\n📧 Notifications will be sent upon completion`);
+                
+                showDownloadPopup('Blockchain Verification Report', reportData);
+            });
+        }
+
+        function deploySmartContract() {
+            showExecutionOverlay('DEPLOYING SMART CONTRACT...', () => {
+                alert(`📋 Smart Contract Deployment Successful!\n\n⛓️ Contract Details:\n• Contract Address: 0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2\n• Gas Used: 2,847,392\n• Transaction Hash: 0x9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\n\n🔧 Automated Features Enabled:\n• Quality assurance protocols\n• Payment processing\n• Delivery confirmation\n• Compliance monitoring\n• Dispute resolution\n\n✅ Contract successfully deployed on blockchain\n🔐 Multi-signature security enabled\n📊 Real-time monitoring activated`);
+            });
+        }
+
+        function traceComponent() {
+            showExecutionOverlay('TRACING COMPONENT BLOCKCHAIN HISTORY...', () => {
+                alert(`🔎 Component Traceability Analysis Complete!\n\n📦 Component: Advanced Radar Module\n🏭 Origin: Precision Parts (Japan)\n📅 Manufacturing Date: 2024-01-15\n\n🛤️ Supply Chain Journey:\n1. Raw Materials (Australia) ✅ Verified\n2. Component Manufacturing (Japan) ✅ Verified\n3. Quality Testing (Singapore) ✅ Verified\n4. Assembly (India) ✅ Verified\n5. Final Integration (Current Location) 🔄 In Progress\n\n⛓️ Blockchain Records: 47 transactions\n🔐 Tamper-proof: All records verified\n📜 Certifications: ISO 9001, RoHS, CE\n🌱 Carbon Footprint: 2.3 kg CO2e`);
+            });
+        }
+
+        // Sustainability Functions
+        function generateSustainabilityReport() {
+            showExecutionOverlay('GENERATING ESG SUSTAINABILITY REPORT...', () => {
+                const reportData = {
+                    overallScore: 78,
+                    environmental: 85,
+                    social: 70,
+                    governance: 90,
+                    carbonReduction: 23,
+                    renewableEnergy: 67
+                };
+                
+                alert(`🌱 ESG Sustainability Report Generated!\n\n📊 Overall Score: 78/100 (Good)\n\n🌍 Environmental (85/100):\n• Carbon footprint reduction: 23%\n• Renewable energy usage: 67%\n• Waste reduction: 45%\n• Water conservation: 78%\n\n👥 Social (70/100):\n• Labor practices: Good\n• Community impact: Moderate\n• Diversity & inclusion: 65%\n• Safety standards: Excellent\n\n🏛️ Governance (90/100):\n• Transparency: Excellent\n• Compliance: 98%\n• Ethics standards: High\n• Risk management: Robust\n\n💡 Key Recommendations:\n• Increase renewable energy to 80%\n• Improve supplier diversity programs\n• Implement carbon offset initiatives\n• Enhance community engagement`);
+                
+                showDownloadPopup('Sustainability Assessment', reportData);
+            });
+        }
+
+        function assessSupplierSustainability() {
+            showExecutionOverlay('ASSESSING SUPPLIER SUSTAINABILITY METRICS...', () => {
+                alert(`🌱 Supplier Sustainability Assessment Complete!\n\n📊 Assessment Results:\n• Total Suppliers Evaluated: 28\n• High Sustainability Score (80+): 12 suppliers\n• Medium Score (60-79): 11 suppliers\n• Low Score (<60): 5 suppliers\n\n🎯 Top Performing Suppliers:\n• Advanced Defense Systems Ltd: 92/100\n• Steel Industries: 88/100\n• Precision Parts: 85/100\n\n⚠️ Improvement Needed:\n• Rare Earth Mining Co: 34/100\n• Electronics Ltd: 58/100\n\n💡 Recommendations:\n• Prioritize high-scoring suppliers\n• Implement sustainability training\n• Set minimum ESG requirements`);
+            });
+        }
+
+        function calculateCarbonFootprint() {
+            showExecutionOverlay('CALCULATING SUPPLY CHAIN CARBON FOOTPRINT...', () => {
+                alert(`🌍 Carbon Footprint Analysis Complete!\n\n📊 Total Supply Chain Emissions: 2,847 tons CO2e/year\n\n🔍 Breakdown by Tier:\n• Tier 1 Suppliers: 1,245 tons CO2e (44%)\n• Tier 2 Suppliers: 892 tons CO2e (31%)\n• Tier 3 Suppliers: 567 tons CO2e (20%)\n• Transportation: 143 tons CO2e (5%)\n\n🎯 Reduction Opportunities:\n• Switch to renewable energy: -15%\n• Optimize logistics routes: -8%\n• Local sourcing initiatives: -12%\n• Supplier efficiency programs: -10%\n\n🌱 Potential Total Reduction: 45% (1,281 tons CO2e)\n💰 Estimated Cost Savings: $2.3M annually`);
+            });
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('supplierModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

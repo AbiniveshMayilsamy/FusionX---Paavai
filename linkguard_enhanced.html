@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkGuard - AI Supply Chain Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Login Styles */
+        .login-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: floatBubbles 20s infinite linear;
+        }
+        
+        @keyframes floatBubbles {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .login-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+            transform: translateY(0);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-form:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            position: relative;
+            color: #333;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 1);
+            outline: none;
+        }
+        
+        .form-group input:hover, .form-group select:hover {
+            border-color: #764ba2;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+        
+        .login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Execution Effects */
+        .execution-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #000000, #1a1a1a, #000000);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeInOverlay 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .execution-content {
+            text-align: center;
+            color: white;
+            max-width: 80%;
+        }
+        
+        .execution-text {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: typewriter 3s steps(40) forwards;
+            border-right: 3px solid #00ff00;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        @keyframes typewriter {
+            from { width: 0; opacity: 1; }
+            to { width: 100%; opacity: 1; }
+        }
+        
+        .ai-processing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .ai-processing-text {
+            font-size: 1.5em;
+            margin-right: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .processing-dots {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .processing-dot {
+            width: 15px;
+            height: 15px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .processing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .processing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }\n            40% { transform: scale(1); }
+        }
+        
+        .execution-buttons {
+            margin-top: 40px;
+        }
+        
+        .execution-btn {
+            padding: 15px 30px;
+            margin: 0 15px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+        
+        .execution-btn:hover {
+            background: #00ff00;
+            color: black;
+            box-shadow: 0 0 20px #00ff00;
+        }
+        
+        .hover-effect {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-effect:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { background: rgba(0, 0, 0, 0.8); }
+            51%, 100% { background: rgba(40, 40, 40, 0.9); }
+        }
+
+        /* Dashboard Styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            color: #fff;
+        }
+
+        .tab.active {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .ai-assistant-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            border: 2px solid #00ff00;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .ai-assistant-header {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: black;
+            padding: 15px;
+            border-radius: 13px 13px 0 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ai-chat-area {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ai-input-area {
+            padding: 15px;
+            border-top: 1px solid #00ff00;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ai-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            border: none;
+            color: black;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 255, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .ai-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 255, 0, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: footerShine 3s infinite;
+        }
+        
+        @keyframes footerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .developer-info {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .developer-contact {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hidden { display: none; }
+
+        .synthetic-data-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .data-sample {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #00ff00;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .contract-sample {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <h1 class="login-title">LinkGuard</h1>
+            <p style="text-align: center; margin-bottom: 30px; color: #666;">AI-Powered Supply Chain Intelligence Platform</p>
+            
+            <div class="form-group">
+                <label for="userType">User Type</label>
+                <select id="userType">
+                    <option value="admin">Administrator</option>
+                    <option value="analyst">Supply Chain Analyst</option>
+                    <option value="viewer">Risk Assessment Viewer</option>
+                    <option value="auditor">Compliance Auditor</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" value="admin" placeholder="Enter username">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" value="admin@admin.com" placeholder="Enter email">
+            </div>
+            
+            <button class="login-btn" onclick="login()">🔐 Secure Login</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="container hidden">
+        <div class="header">
+            <h1>🛡️ LinkGuard AI Supply Chain Intelligence</h1>
+            <p>Advanced Multi-Tier Supply Chain Mapping & Predictive Risk Analytics Platform</p>
+            <button onclick="logout()" style="position: absolute; top: 20px; right: 20px; background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">🚪 Logout</button>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('dashboard')">🏠 Dashboard</button>
+                <button class="tab" onclick="switchTab('synthetic')">📊 Synthetic Data</button>
+                <button class="tab" onclick="switchTab('contracts')">📋 Sample Contracts</button>
+                <button class="tab" onclick="switchTab('ai-assistant')">🤖 AI Assistant</button>
+                <button class="tab" onclick="switchTab('analysis')">📈 Analysis</button>
+            </div>
+
+            <div id="dashboard" class="tab-content active">
+                <h2>🏠 Supply Chain Dashboard</h2>
+                <div class="input-group">
+                    <label for="equipmentName">Equipment/Component Name</label>
+                    <input type="text" id="equipmentName" placeholder="e.g., Advanced Radar System" class="hover-effect">
+                </div>
+                <div class="input-group">
+                    <label for="supplierName">Supplier Name</label>
+                    <input type="text" id="supplierName" placeholder="Primary Supplier" class="hover-effect">
+                </div>
+                <button class="btn hover-effect" onclick="executeAnalysis()">🔍 Execute AI Analysis</button>
+            </div>
+
+            <div id="synthetic" class="tab-content">
+                <h2>📊 Synthetic Dataset Generator</h2>
+                <div class="synthetic-data-panel">
+                    <h3>🎲 Generated Supply Chain Data</h3>
+                    <div class="data-sample">
+                        <strong>Supplier Dataset (Sample):</strong><br>
+                        {<br>
+                        &nbsp;&nbsp;"supplier_id": "SUP_001",<br>
+                        &nbsp;&nbsp;"name": "Advanced Defense Systems Ltd",<br>
+                        &nbsp;&nbsp;"country": "India",<br>
+                        &nbsp;&nbsp;"tier": 1,<br>
+                        &nbsp;&nbsp;"risk_score": 0.23,<br>
+                        &nbsp;&nbsp;"reliability": 0.94,<br>
+                        &nbsp;&nbsp;"certifications": ["ISO 9001", "AS9100"],<br>
+                        &nbsp;&nbsp;"annual_revenue": 750000000,<br>
+                        &nbsp;&nbsp;"employees": 8500<br>
+                        }
+                    </div>
+                    <div class="data-sample">
+                        <strong>Risk Assessment Dataset:</strong><br>
+                        {<br>
+                        &nbsp;&nbsp;"component_id": "COMP_RAD_001",<br>
+                        &nbsp;&nbsp;"vulnerability_score": 0.78,<br>
+                        &nbsp;&nbsp;"geopolitical_risk": "medium",<br>
+                        &nbsp;&nbsp;"supply_disruption_probability": 0.15,<br>
+                        &nbsp;&nbsp;"alternative_suppliers": 3,<br>
+                        &nbsp;&nbsp;"critical_path": true<br>
+                        }
+                    </div>
+                    <button class="btn hover-effect" onclick="generateSyntheticData()">🎲 Generate New Dataset</button>
+                </div>
+            </div>
+
+            <div id="contracts" class="tab-content">
+                <h2>📋 Sample Contract Templates</h2>
+                <div class="contract-sample">
+                    <h4>🏭 SUPPLY CHAIN AGREEMENT TEMPLATE</h4>
+                    <p><strong>AGREEMENT NO:</strong> SCA-2024-001</p>
+                    <p><strong>PARTIES:</strong> LinkGuard Systems (Buyer) & [Supplier Name] (Seller)</p>
+                    <p><strong>EFFECTIVE DATE:</strong> [Date]</p>
+                    <br>
+                    <p><strong>ARTICLE 1: SUPPLY REQUIREMENTS</strong></p>
+                    <p>1.1 The Supplier agrees to provide [Component/Equipment] as per specifications outlined in Annexure A.</p>
+                    <p>1.2 Quality standards must meet or exceed ISO 9001:2015 requirements.</p>
+                    <p>1.3 All deliveries must include blockchain verification certificates.</p>
+                    <br>
+                    <p><strong>ARTICLE 2: RISK MANAGEMENT</strong></p>
+                    <p>2.1 Supplier must maintain risk score below 0.3 on LinkGuard AI assessment.</p>
+                    <p>2.2 Immediate notification required for any supply chain disruptions.</p>
+                    <p>2.3 Alternative sourcing plans must be submitted quarterly.</p>
+                </div>
+                <div class="contract-sample">
+                    <h4>⛓️ BLOCKCHAIN VERIFICATION AGREEMENT</h4>
+                    <p><strong>SMART CONTRACT ADDRESS:</strong> 0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2</p>
+                    <p><strong>VERIFICATION PROTOCOL:</strong> Multi-signature validation required</p>
+                    <p><strong>COMPLIANCE TERMS:</strong> Automated monitoring and reporting</p>
+                </div>
+                <button class="btn hover-effect" onclick="generateContract()">📄 Generate Custom Contract</button>
+            </div>
+
+            <div id="ai-assistant" class="tab-content">
+                <h2>🤖 AI Assistant Integration</h2>
+                <div class="synthetic-data-panel">
+                    <h3>🧠 AI Assistant Capabilities</h3>
+                    <p>• Real-time supply chain risk assessment</p>
+                    <p>• Predictive analytics and forecasting</p>
+                    <p>• Alternative supplier recommendations</p>
+                    <p>• Compliance monitoring and alerts</p>
+                    <p>• Natural language query processing</p>
+                    <br>
+                    <div class="input-group">
+                        <label for="aiQuery">Ask AI Assistant:</label>
+                        <input type="text" id="aiQuery" placeholder="e.g., What are the risks for Tier 2 suppliers?" class="hover-effect">
+                    </div>
+                    <button class="btn hover-effect" onclick="queryAI()">🤖 Ask AI</button>
+                    <div id="aiResponse" style="margin-top: 20px; padding: 15px; background: rgba(0,255,0,0.1); border-radius: 8px; display: none;"></div>
+                </div>
+            </div>
+
+            <div id="analysis" class="tab-content">
+                <h2>📈 Advanced Analytics</h2>
+                <div class="synthetic-data-panel">
+                    <h3>📊 Current Analysis Results</h3>
+                    <div class="data-sample">
+                        <strong>Risk Assessment Summary:</strong><br>
+                        • Total Suppliers Analyzed: 47<br>
+                        • High Risk Suppliers: 8 (17%)<br>
+                        • Medium Risk: 15 (32%)<br>
+                        • Low Risk: 24 (51%)<br>
+                        • AI Confidence Level: 94.7%
+                    </div>
+                    <div class="data-sample">
+                        <strong>Predictive Insights:</strong><br>
+                        • Supply disruption probability (next 30 days): 12%<br>
+                        • Cost optimization potential: 18%<br>
+                        • Alternative suppliers available: 23<br>
+                        • Blockchain verification coverage: 89%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant Panel -->
+    <div id="aiAssistantPanel" class="ai-assistant-panel">
+        <div class="ai-assistant-header">
+            🤖 LinkGuard AI Assistant
+            <button onclick="toggleAIAssistant()" style="float: right; background: none; border: none; color: black; font-size: 18px; cursor: pointer;">×</button>
+        </div>
+        <div class="ai-chat-area" id="aiChatArea">
+            <div style="color: #00ff00; margin-bottom: 10px;">
+                🤖 AI: Hello! I'm your LinkGuard AI Assistant. I can help you with supply chain analysis, risk assessment, and strategic recommendations. How can I assist you today?
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <input type="text" class="ai-input" id="aiChatInput" placeholder="Type your question..." onkeypress="handleAIChatEnter(event)">
+            <button onclick="sendAIMessage()" style="width: 100%; margin-top: 10px; padding: 8px; background: #00ff00; color: black; border: none; border-radius: 5px; cursor: pointer;">Send</button>
+        </div>
+    </div>
+
+    <!-- AI Toggle Button -->
+    <button id="aiToggleBtn" class="ai-toggle-btn" onclick="toggleAIAssistant()">🤖</button>
+
+    <!-- Execution Overlay -->
+    <div id="executionOverlay" class="execution-overlay">
+        <div class="execution-content">
+            <div class="execution-text" id="executionText">AI PROCESSING SUPPLY CHAIN DATA...</div>
+            <div class="ai-processing">
+                <div class="ai-processing-text">🤖 AI ANALYZING</div>
+                <div class="processing-dots">
+                    <div class="processing-dot"></div>
+                    <div class="processing-dot"></div>
+                    <div class="processing-dot"></div>
+                </div>
+            </div>
+            <div class="execution-buttons" id="executionButtons" style="display: none;">
+                <button class="execution-btn" onclick="saveResults()">💾 SAVE</button>
+                <button class="execution-btn" onclick="exitExecution()">🚪 EXIT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="developer-info">Developed by GaneshPrabu</div>
+        <div class="developer-contact">+91-7338703622 | ganeshprabu.bo2024@sece.ac.in</div>
+    </div>
+
+    <script>
+        const GEMINI_API_KEY = 'AIzaSyB1HGu5UDHnkklxIbEiadIGCduy62uc8uc';
+        
+        // Synthetic datasets
+        const syntheticSuppliers = [
+            {id: "SUP_001", name: "Advanced Defense Systems Ltd", country: "India", tier: 1, risk_score: 0.23, reliability: 0.94},
+            {id: "SUP_002", name: "Precision Electronics Corp", country: "Germany", tier: 2, risk_score: 0.45, reliability: 0.87},
+            {id: "SUP_003", name: "Rare Earth Mining Co", country: "China", tier: 3, risk_score: 0.78, reliability: 0.56},
+            {id: "SUP_004", name: "Composite Materials Inc", country: "USA", tier: 2, risk_score: 0.34, reliability: 0.91},
+            {id: "SUP_005", name: "Steel Industries Ltd", country: "India", tier: 2, risk_score: 0.29, reliability: 0.89}
+        ];
+
+        const syntheticComponents = [
+            {id: "COMP_RAD_001", name: "Advanced Radar Module", vulnerability: 0.78, critical_path: true},
+            {id: "COMP_ENG_002", name: "Turbine Engine Component", vulnerability: 0.45, critical_path: false},
+            {id: "COMP_ARM_003", name: "Armor Plating System", vulnerability: 0.23, critical_path: true},
+            {id: "COMP_COM_004", name: "Communication Array", vulnerability: 0.67, critical_path: true}
+        ];
+
+        function login() {
+            const userType = document.getElementById('userType').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            
+            if ((userType === 'admin' && username === 'admin' && email === 'admin@admin.com') ||
+                (userType !== 'admin' && username && email)) {
+                
+                showExecutionOverlay('AUTHENTICATING USER CREDENTIALS...', () => {
+                    document.getElementById('loginPage').classList.add('hidden');
+                    document.getElementById('dashboardPage').classList.remove('hidden');
+                    alert(`🎉 Welcome ${username}!\n\n✅ Secure login successful as ${userType}\n🤖 AI systems initialized\n⛓️ Blockchain connection established\n📊 Real-time monitoring active`);
+                });
+            } else {
+                alert('🔒 Authentication Failed!\n\nFor admin access use:\nUsername: admin\nEmail: admin@admin.com');
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboardPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function executeAnalysis() {
+            const equipment = document.getElementById('equipmentName').value;
+            const supplier = document.getElementById('supplierName').value;
+            
+            if (equipment || supplier) {
+                showExecutionOverlay('EXECUTING AI SUPPLY CHAIN ANALYSIS...', () => {
+                    alert(`🤖 AI Analysis Complete!\n\n📋 Equipment: "${equipment}"\n🏭 Supplier: "${supplier}"\n\n✅ Risk assessment completed\n📊 Vulnerability analysis finished\n🔍 Alternative suppliers identified\n⛓️ Blockchain verification initiated\n\nResults saved to analysis dashboard.`);
+                });
+            } else {
+                alert('⚠️ Please enter equipment or supplier information for analysis.');
+            }
+        }
+
+        function generateSyntheticData() {
+            showExecutionOverlay('GENERATING SYNTHETIC DATASET...', () => {
+                const randomSupplier = syntheticSuppliers[Math.floor(Math.random() * syntheticSuppliers.length)];
+                const randomComponent = syntheticComponents[Math.floor(Math.random() * syntheticComponents.length)];
+                
+                alert(`🎲 New Synthetic Dataset Generated!\n\n🏭 Supplier: ${randomSupplier.name}\n🌍 Country: ${randomSupplier.country}\n📊 Risk Score: ${randomSupplier.risk_score}\n🔧 Component: ${randomComponent.name}\n⚠️ Vulnerability: ${randomComponent.vulnerability}\n\nDataset ready for ML training and analysis.`);
+            });
+        }
+
+        function generateContract() {
+            showExecutionOverlay('GENERATING SMART CONTRACT...', () => {
+                const contractId = 'SCA-' + new Date().getFullYear() + '-' + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                alert(`📄 Smart Contract Generated!\n\n📋 Contract ID: ${contractId}\n⛓️ Blockchain Address: 0x${Math.random().toString(16).substr(2, 40)}\n🔐 Multi-signature enabled\n📊 Automated compliance monitoring\n✅ Ready for deployment\n\nContract template saved to documents.`);
+            });
+        }
+
+        function queryAI() {
+            const query = document.getElementById('aiQuery').value;
+            if (query) {
+                showExecutionOverlay('AI PROCESSING YOUR QUERY...', () => {
+                    const response = generateAIResponse(query);
+                    document.getElementById('aiResponse').innerHTML = `<strong>🤖 AI Response:</strong><br>${response}`;
+                    document.getElementById('aiResponse').style.display = 'block';
+                    document.getElementById('aiQuery').value = '';
+                });
+            }
+        }
+
+        function generateAIResponse(query) {
+            const responses = [
+                "Based on current analysis, Tier 2 suppliers show 23% higher risk due to geopolitical tensions. Recommend diversification strategy.",
+                "AI predicts 15% supply disruption probability in next 30 days. Alternative suppliers identified in Australia and Canada.",
+                "Risk assessment complete: 8 high-risk suppliers detected. Blockchain verification recommended for critical components.",
+                "Cost optimization potential: 18% savings possible through strategic supplier consolidation and route optimization.",
+                "Predictive model indicates seasonal demand spike in Q3. Recommend increasing buffer stock by 25%."
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function toggleAIAssistant() {
+            const panel = document.getElementById('aiAssistantPanel');
+            const btn = document.getElementById('aiToggleBtn');
+            
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+                btn.style.display = 'none';
+            } else {
+                panel.style.display = 'none';
+                btn.style.display = 'block';
+            }
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiChatInput');
+            const chatArea = document.getElementById('aiChatArea');
+            const message = input.value.trim();
+            
+            if (message) {
+                chatArea.innerHTML += `<div style="margin: 10px 0; color: #fff;">👤 You: ${message}</div>`;
+                
+                setTimeout(() => {
+                    const aiResponse = generateAIResponse(message);
+                    chatArea.innerHTML += `<div style="margin: 10px 0; color: #00ff00;">🤖 AI: ${aiResponse}</div>`;
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 1000);
+                
+                input.value = '';
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        }
+
+        function handleAIChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendAIMessage();
+            }
+        }
+
+        function showExecutionOverlay(text, callback) {
+            const overlay = document.getElementById('executionOverlay');
+            const executionText = document.getElementById('executionText');
+            const buttons = document.getElementById('executionButtons');
+            
+            executionText.textContent = text;
+            overlay.style.display = 'flex';
+            buttons.style.display = 'none';
+            
+            setTimeout(() => {
+                buttons.style.display = 'block';
+                window.currentCallback = callback;
+            }, 3000);
+        }
+
+        function saveResults() {
+            if (window.currentCallback) {
+                window.currentCallback();
+            }
+            exitExecution();
+        }
+
+        function exitExecution() {
+            document.getElementById('executionOverlay').style.display = 'none';
+        }
+
+        // Add hover effects to all elements with hover-effect class
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoverElements = document.querySelectorAll('.hover-effect');
+            hoverElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+supplier_id,name,country,tier,risk_score,reliability,annual_revenue,employees,certifications,sustainability_score,blockchain_verified
+SUP_001,Advanced Defense Systems Ltd,India,1,0.23,0.94,750000000,8500,"ISO 9001, AS9100, CMMI Level 5",92,TRUE
+SUP_002,Precision Electronics Corp,Germany,2,0.45,0.87,420000000,3200,"ISO 9001, IEC 61508, RoHS",78,FALSE
+SUP_003,Rare Earth Mining Co,China,3,0.78,0.56,180000000,900,"ISO 14001 (Expired)",23,FALSE
+SUP_004,Steel Industries Ltd,India,2,0.29,0.89,320000000,2100,"ISO 9001, ISO 14001",88,TRUE
+SUP_005,Composite Materials Inc,USA,3,0.34,0.91,250000000,1500,"AS9100, NADCAP",85,TRUE
+SUP_006,Precision Parts Japan,Japan,3,0.25,0.93,180000000,1200,"ISO 9001, TS 16949",90,TRUE
+SUP_007,Mining Corp Congo,Congo,4,0.89,0.34,95000000,450,"None",15,FALSE
+SUP_008,Raw Materials Australia,Australia,4,0.19,0.96,140000000,800,"ISO 9001, ISO 14001",95,TRUE
+SUP_009,Electronics Manufacturing,South Korea,2,0.38,0.85,380000000,2800,"ISO 9001, ISO 27001",82,TRUE
+SUP_010,Aerospace Components,France,2,0.31,0.88,290000000,1900,"AS9100, EN 9100",87,TRUE
+SUP_011,Titanium Alloys Ltd,Russia,3,0.67,0.72,160000000,750,"ISO 9001",45,FALSE
+SUP_012,Advanced Ceramics,UK,3,0.28,0.92,220000000,1100,"ISO 9001, AS9100",89,TRUE
+SUP_013,Semiconductor Solutions,Taiwan,2,0.42,0.84,450000000,3500,"ISO 9001, ISO 14001",76,TRUE
+SUP_014,Optical Systems,Israel,2,0.35,0.86,310000000,2200,"ISO 9001, AS9100",83,TRUE
+SUP_015,Power Systems,Canada,2,0.33,0.87,340000000,2400,"ISO 9001, CSA",85,TRUE
+SUP_016,Hydraulic Components,Italy,3,0.41,0.83,190000000,1300,"ISO 9001, CE",79,TRUE
+SUP_017,Sensor Technologies,Netherlands,3,0.37,0.85,210000000,1400,"ISO 9001, IEC 61508",81,TRUE
+SUP_018,Battery Systems,China,3,0.52,0.78,170000000,950,"ISO 9001, UL",68,FALSE
+SUP_019,Cooling Systems,Sweden,3,0.26,0.91,200000000,1250,"ISO 9001, ISO 14001",91,TRUE
+SUP_020,Navigation Systems,Norway,2,0.30,0.89,280000000,1800,"ISO 9001, AS9100",86,TRUE
