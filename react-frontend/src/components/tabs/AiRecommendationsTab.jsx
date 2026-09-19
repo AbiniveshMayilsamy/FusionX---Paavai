@@ -5,7 +5,7 @@ export function AiRecommendationsTab({ onGenerateActionPlan }) {
   return (
     <div className="tab-content">
       <h2>
-        <Lightbulb size={22} style={{ color: '#ffd700' }} />
+        <Lightbulb size={22} style={{ color: 'var(--primary-gold)' }} />
         AI-Generated Strategic Recommendations
       </h2>
 

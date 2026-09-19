@@ -9,7 +9,13 @@ import {
   Database,
   FileSignature,
   Bot,
-  Brain
+  Brain,
+  Globe,
+  Clock,
+  Warehouse,
+  Shield,
+  Compass,
+  Network
 } from 'lucide-react';
 
 import { INITIAL_SUPPLIERS } from './data/suppliersData';
@@ -21,6 +27,11 @@ import { SupplierIntelligenceForm } from './components/SupplierIntelligenceForm'
 import { AiPredictiveInsights } from './components/AiPredictiveInsights';
 
 // Tabs
+import { AutomaticTierMapping } from './components/tabs/AutomaticTierMapping';
+import { DelayPredictionTab } from './components/tabs/DelayPredictionTab';
+import { DigitalAccountabilityTab } from './components/tabs/DigitalAccountabilityTab';
+import { InventoryStorageTab } from './components/tabs/InventoryStorageTab';
+import { LogisticRouteTab } from './components/tabs/LogisticRouteTab';
 import { SupplyChainMappingTab } from './components/tabs/SupplyChainMappingTab';
 import { RiskAnalysisTab } from './components/tabs/RiskAnalysisTab';
 import { AiRecommendationsTab } from './components/tabs/AiRecommendationsTab';
@@ -31,16 +42,34 @@ import { SyntheticDataTab } from './components/tabs/SyntheticDataTab';
 import { ContractsTab } from './components/tabs/ContractsTab';
 import { AiAssistantTab } from './components/tabs/AiAssistantTab';
 import { MlTrainingTab } from './components/tabs/MlTrainingTab';
+import { CoalitionTrustTab } from './components/tabs/CoalitionTrustTab';
+import { DatabaseViewerTab } from './components/tabs/DatabaseViewerTab';
 
 // Modals
 import { ExecutionOverlay } from './components/modals/ExecutionOverlay';
 import { SupplierModal } from './components/modals/SupplierModal';
 import { DownloadPopup } from './components/modals/DownloadPopup';
 import { AiAssistantDrawer } from './components/modals/AiAssistantDrawer';
+import { LandingPage } from './components/LandingPage';
+import { Waves } from './components/react-bits';
 
 export function App() {
+  // View Mode: 'landing' (60fps.fr showcase) or 'app' (login / dashboard)
+  const [viewMode, setViewMode] = useState('landing');
+
   // Authentication State
   const [currentUser, setCurrentUser] = useState(null);
+
+  // Global 60fps Cursor State
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+
+  React.useEffect(() => {
+    const handleMove = (e) => {
+      setCursorPos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
 
   // Active Tab (default: mapping)
   const [activeTab, setActiveTab] = useState('mapping');
@@ -94,6 +123,7 @@ export function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     setActiveTab('mapping');
+    setViewMode('landing');
   };
 
   // Add Supplier Handler
@@ -121,7 +151,7 @@ export function App() {
       };
 
       setSuppliers((prev) => [...prev, created]);
-      alert(`🏭 Supplier "${newSup.name}" has been verified and registered into Tier ${newSup.tier}.`);
+      alert(` Supplier "${newSup.name}" has been verified and registered into Tier ${newSup.tier}.`);
     });
   };
 
@@ -221,7 +251,7 @@ LinkGuard AI Neural Engine v2.0
     URL.revokeObjectURL(url);
 
     setDownloadModalState({ isOpen: false, reportType: '', reportData: null });
-    alert(`📥 Report Downloaded Successfully!\nFile: ${filename}\nFormat: ${format.toUpperCase()}`);
+    alert(` Report Downloaded Successfully!\nFile: ${filename}\nFormat: ${format.toUpperCase()}`);
   };
 
   // Supplier inspection & Audit trigger
@@ -233,17 +263,27 @@ LinkGuard AI Neural Engine v2.0
   const handleInitiateAudit = (supplierName) => {
     setIsSupplierModalOpen(false);
     triggerExecution(`INITIATING AUTOMATED COMPLIANCE & ESG AUDIT FOR ${supplierName.toUpperCase()}...`, () => {
-      alert(`🔍 AI Audit for "${supplierName}" completed successfully.\nAll smart contract assertions and ISO certificates verified.`);
+      alert(` AI Audit for "${supplierName}" completed successfully.\nAll smart contract assertions and ISO certificates verified.`);
     });
   };
 
-  // If not logged in, render the Login screen
+  // 1. Render 60fps.fr Themed Landing Page
+  if (viewMode === 'landing') {
+    return (
+      <LandingPage
+        onLaunchPlatform={() => setViewMode('app')}
+      />
+    );
+  }
+
+  // 2. If in 'app' mode and not logged in, render the Login screen
   if (!currentUser) {
     return (
       <>
         <Login
           onLoginSuccess={handleLoginSuccess}
           onStartExecution={triggerExecution}
+          onBackToLanding={() => setViewMode('landing')}
         />
         <ExecutionOverlay
           isVisible={executionState.isVisible}
@@ -251,23 +291,56 @@ LinkGuard AI Neural Engine v2.0
           onSave={handleExecutionSave}
           onExit={handleExecutionExit}
         />
+        <div
+          className="fps-global-cursor-dot"
+          style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
+        />
+        <div
+          className="fps-global-cursor-ring"
+          style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
+        />
       </>
     );
   }
 
-  // Logged-in Dashboard
+  // 3. Logged-in Dashboard
   return (
-    <div className="container">
-      {/* Header */}
-      <Header user={currentUser} onLogout={handleLogout} />
+    <div className="container" style={{ position: 'relative' }}>
+      {/* React Bits Ambient Background Waves */}
+      <Waves
+        lineColor="rgba(217, 186, 132, 0.18)"
+        backgroundColor="transparent"
+        waveSpeedX={0.012}
+        waveSpeedY={0.006}
+        waveAmpX={34}
+        waveAmpY={16}
+        xGap={16}
+        yGap={36}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 0
+        }}
+      />
+
+      {/* Header with return to 60fps landing page option */}
+      <Header
+        user={currentUser}
+        onLogout={handleLogout}
+        onShowLanding={() => setViewMode('landing')}
+        onOpenDashAnalytics={() => window.open('http://localhost:3000', '_blank')}
+      />
 
       {/* Real-Time Supply Chain Status Monitor */}
       <RealTimeMonitor />
 
       {/* Management Cards (Grid: Equipment Registration + Supplier Intelligence) */}
       <div className="main-content">
-        <EquipmentRegistration onRegisterEquipment={handleRegisterEquipment} />
-        <SupplierIntelligenceForm onAddSupplier={handleAddSupplier} />
+        <EquipmentRegistration onRegisterEquipment={handleRegisterEquipment} userRole={currentUser.userType} />
+        <SupplierIntelligenceForm onAddSupplier={handleAddSupplier} userRole={currentUser.userType} />
       </div>
 
       {/* AI Predictive Insights */}
@@ -280,69 +353,132 @@ LinkGuard AI Neural Engine v2.0
             className={`tab ${activeTab === 'mapping' ? 'active' : ''}`}
             onClick={() => setActiveTab('mapping')}
           >
-            <Map size={16} /> 🗺️ Supply Chain Mapping
+            <Network size={16} /> Auto Tier Mapping
+          </button>
+          <button
+            className={`tab ${activeTab === 'delay-prediction' ? 'active' : ''}`}
+            onClick={() => setActiveTab('delay-prediction')}
+          >
+            <Clock size={16} /> Delay Prediction
+          </button>
+          <button
+            className={`tab ${activeTab === 'accountability' ? 'active' : ''}`}
+            onClick={() => setActiveTab('accountability')}
+          >
+            <Shield size={16} /> Accountability Ledger
+          </button>
+          <button
+            className={`tab ${activeTab === 'inventory' ? 'active' : ''}`}
+            onClick={() => setActiveTab('inventory')}
+          >
+            <Warehouse size={16} /> Inventory Storage
+          </button>
+          <button
+            className={`tab ${activeTab === 'logistics' ? 'active' : ''}`}
+            onClick={() => setActiveTab('logistics')}
+          >
+            <Compass size={16} /> Logistics & 3D Globe
           </button>
           <button
             className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
             onClick={() => setActiveTab('analysis')}
           >
-            <BarChart3 size={16} /> 📈 Risk Analysis
+            <BarChart3 size={16} /> Risk Analysis
           </button>
           <button
             className={`tab ${activeTab === 'recommendations' ? 'active' : ''}`}
             onClick={() => setActiveTab('recommendations')}
           >
-            <Lightbulb size={16} /> 💡 AI Recommendations
+            <Lightbulb size={16} /> AI Recommendations
           </button>
           <button
             className={`tab ${activeTab === 'reports' ? 'active' : ''}`}
             onClick={() => setActiveTab('reports')}
           >
-            <FileText size={16} /> 📋 Advanced Reports
+            <FileText size={16} /> Advanced Reports
           </button>
           <button
             className={`tab ${activeTab === 'blockchain' ? 'active' : ''}`}
             onClick={() => setActiveTab('blockchain')}
           >
-            <Link2 size={16} /> ⛓️ Blockchain Verification
+            <Link2 size={16} /> Blockchain Verification
+          </button>
+          <button
+            className={`tab ${activeTab === 'coalition' ? 'active' : ''}`}
+            onClick={() => setActiveTab('coalition')}
+          >
+            <Globe size={16} /> Coalition Trust
           </button>
           <button
             className={`tab ${activeTab === 'sustainability' ? 'active' : ''}`}
             onClick={() => setActiveTab('sustainability')}
           >
-            <Leaf size={16} /> 🌱 Sustainability
+            <Leaf size={16} /> Sustainability
           </button>
           <button
             className={`tab ${activeTab === 'synthetic' ? 'active' : ''}`}
             onClick={() => setActiveTab('synthetic')}
           >
-            <Database size={16} /> 📊 Data Access
+            <Database size={16} /> Data Access
           </button>
           <button
             className={`tab ${activeTab === 'contracts' ? 'active' : ''}`}
             onClick={() => setActiveTab('contracts')}
           >
-            <FileSignature size={16} /> 📋 Contracts
+            <FileSignature size={16} /> Contracts
           </button>
           <button
             className={`tab ${activeTab === 'ai-assistant' ? 'active' : ''}`}
             onClick={() => setActiveTab('ai-assistant')}
           >
-            <Bot size={16} /> 🤖 AI Assistant
+            <Bot size={16} /> AI Assistant
           </button>
           <button
             className={`tab ${activeTab === 'ml-training' ? 'active' : ''}`}
             onClick={() => setActiveTab('ml-training')}
           >
-            <Brain size={16} /> 🧠 ML Training
+            <Brain size={16} /> ML Training
+          </button>
+          <button
+            className={`tab ${activeTab === 'db-viewer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('db-viewer')}
+          >
+            <Database size={16} /> DB Viewer
           </button>
         </div>
 
         {/* Tab Content Display */}
         {activeTab === 'mapping' && (
-          <SupplyChainMappingTab
+          <AutomaticTierMapping
             suppliers={suppliers}
             onSelectSupplier={handleSelectSupplier}
+            onTriggerExecution={triggerExecution}
+          />
+        )}
+
+        {activeTab === 'delay-prediction' && (
+          <DelayPredictionTab
+            onTriggerExecution={triggerExecution}
+          />
+        )}
+
+        {activeTab === 'accountability' && (
+          <DigitalAccountabilityTab
+            currentUser={currentUser}
+            onTriggerExecution={triggerExecution}
+          />
+        )}
+
+        {activeTab === 'inventory' && (
+          <InventoryStorageTab
+            onTriggerExecution={triggerExecution}
+            userRole={currentUser.userType}
+          />
+        )}
+
+        {activeTab === 'logistics' && (
+          <LogisticRouteTab
+            onTriggerExecution={triggerExecution}
           />
         )}
 
@@ -380,26 +516,29 @@ LinkGuard AI Neural Engine v2.0
 
         {activeTab === 'blockchain' && (
           <BlockchainVerificationTab
-            onInitiateVerification={() => {
-              triggerExecution('VERIFYING CRYPTOGRAPHIC LEDGER HASHS & CONSENSUS...', () => {
-                alert('⛓️ Blockchain Verification Complete: 23 suppliers verified on ledger.');
-              });
-            }}
+            userRole={currentUser?.userType || 'viewer'}
+            userName={currentUser?.username}
+            onStartExecution={triggerExecution}
             onDeployContract={() => {
               triggerExecution('DEPLOYING SMART CONTRACT TO DECENTRALIZED NETWORK...', () => {
-                alert('📋 Smart Contract successfully deployed at address 0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2');
+                alert(' Smart Contract successfully deployed at address 0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2');
               });
             }}
             onTraceComponent={() => {
               triggerExecution('QUERYING IMMUTABLE PROVENANCE FOR CRITICAL RADAR MODULE...', () => {
-                alert('🔎 Component Trace Complete:\nMined in Australia ➔ Processed in Japan ➔ Assembled in India ➔ Quality Verified.');
+                alert(' Component Trace Complete:\nMined in Australia ➔ Processed in Japan ➔ Assembled in India ➔ Quality Verified.');
               });
             }}
           />
         )}
 
+        {activeTab === 'coalition' && (
+          <CoalitionTrustTab onStartExecution={triggerExecution} />
+        )}
+
         {activeTab === 'sustainability' && (
           <SustainabilityTab
+            userRole={currentUser.userType}
             onGenerateEsgReport={() => {
               triggerExecution('GENERATING ESG SUSTAINABILITY & EMISSIONS AUDIT...', () => {
                 setDownloadModalState({
@@ -411,31 +550,36 @@ LinkGuard AI Neural Engine v2.0
             }}
             onAssessSuppliers={() => {
               triggerExecution('ASSESSING TIER-LEVEL DECARBONIZATION RATINGS...', () => {
-                alert('🌱 ESG Assessment Complete: 12 High-Performing Suppliers Identified.');
+                alert(' ESG Assessment Complete: 12 High-Performing Suppliers Identified.');
               });
             }}
             onCalculateFootprint={() => {
               triggerExecution('CALCULATING ANNUAL SUPPLY CHAIN CO2e EMISSIONS...', () => {
-                alert('🌍 Total Annual Emissions: 2,847 tons CO2e.\nPotential reduction of 45% achievable via renewable route shifts.');
+                alert(' Total Annual Emissions: 2,847 tons CO2e.\nPotential reduction of 45% achievable via renewable route shifts.');
               });
             }}
           />
         )}
 
         {activeTab === 'synthetic' && (
-          <SyntheticDataTab onStartExecution={triggerExecution} />
+          <SyntheticDataTab onStartExecution={triggerExecution} userRole={currentUser.userType} />
         )}
 
         {activeTab === 'contracts' && (
-          <ContractsTab onStartExecution={triggerExecution} />
+          <ContractsTab onStartExecution={triggerExecution} userRole={currentUser.userType} />
         )}
 
         {activeTab === 'ai-assistant' && (
           <AiAssistantTab onStartExecution={triggerExecution} />
         )}
 
+        {activeTab === 'db-viewer' && (
+          <DatabaseViewerTab />
+        )}
+
         {activeTab === 'ml-training' && (
           <MlTrainingTab
+            userRole={currentUser.userType}
             onStartExecution={triggerExecution}
             onShowDownload={(title, data) => {
               setDownloadModalState({
@@ -479,6 +623,24 @@ LinkGuard AI Neural Engine v2.0
         text={executionState.text}
         onSave={handleExecutionSave}
         onExit={handleExecutionExit}
+      />
+
+      {/* 60fps Themed Footer */}
+      <footer className="footer">
+        <div className="developer-info">LINKGUARD DEFENSE INTELLIGENCE PLATFORM // LEVEL 4</div>
+        <div className="developer-contact">
+          NATO NCAGE • CMMC LEVEL 3 • NIST SP 800-161 • SHA-256 ZERO-KNOWLEDGE PROOFS
+        </div>
+      </footer>
+
+      {/* Global 60fps Cursor Follower */}
+      <div
+        className="fps-global-cursor-dot"
+        style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
+      />
+      <div
+        className="fps-global-cursor-ring"
+        style={{ left: `${cursorPos.x}px`, top: `${cursorPos.y}px` }}
       />
     </div>
   );

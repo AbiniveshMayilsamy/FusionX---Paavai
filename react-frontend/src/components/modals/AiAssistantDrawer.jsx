@@ -7,7 +7,7 @@ export function AiAssistantDrawer({ isOpen, onToggle }) {
     {
       id: 1,
       sender: 'bot',
-      text: "🤖 LinkGuard AI: Greetings! I am your real-time Supply Chain Intelligence Assistant. Ask me anything about multi-tier vulnerabilities, risk mitigation, ESG compliance, or alternative supplier recommendations."
+      text: " LinkGuard AI: Greetings! I am your real-time Supply Chain Intelligence Assistant. Ask me anything about multi-tier vulnerabilities, risk mitigation, ESG compliance, or alternative supplier recommendations."
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -39,7 +39,7 @@ export function AiAssistantDrawer({ isOpen, onToggle }) {
         {
           id: Date.now() + 1,
           sender: 'bot',
-          text: `🤖 AI: ${randomResponse}`
+          text: ` AI: ${randomResponse}`
         }
       ]);
       setIsTyping(false);
@@ -51,7 +51,7 @@ export function AiAssistantDrawer({ isOpen, onToggle }) {
       {/* Floating Toggle Button */}
       {!isOpen && (
         <button className="ai-toggle-btn" onClick={onToggle} title="Open AI Assistant">
-          🤖
+          <Bot size={24} color="#000000" strokeWidth={2} />
         </button>
       )}
 
@@ -90,7 +90,7 @@ export function AiAssistantDrawer({ isOpen, onToggle }) {
             ))}
             {isTyping && (
               <div className="ai-chat-msg bot" style={{ fontStyle: 'italic', opacity: 0.8 }}>
-                🤖 AI is analyzing supply graph...
+                 AI is analyzing supply graph...
               </div>
             )}
             <div ref={chatEndRef} />

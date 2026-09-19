@@ -1,0 +1,1008 @@
+/* ==========================================================================
+   60FPS.FR THEMED LANDING PAGE STYLESHEET FOR LINKGUARD
+   Aesthetic: Ultra-minimal matte black, Nekst grotesque display, 
+   Champagne gold (#d9ba84) glowing accents, 60fps cubic-bezier motion
+   ========================================================================== */
+
+:root {
+  --fps-bg: #060709;
+  --fps-bg-card: rgba(0, 0, 0, 0.3);
+  --fps-bg-card-hover: rgba(0, 0, 0, 0.5);
+  --fps-gold: #d9ba84;
+  --fps-gold-dim: rgba(217, 186, 132, 0.25);
+  --fps-gold-glow: rgba(217, 186, 132, 0.6);
+  --fps-text: #ffffff;
+  --fps-text-muted: #8e8e93;
+  --fps-text-dim: #505058;
+  --fps-border: rgba(255, 255, 255, 0.12);
+  --fps-border-active: rgba(217, 186, 132, 0.4);
+  --fps-font-display: 'Nekst', 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fps-font-mono: 'JetBrains Mono', monospace;
+  --fps-font-body: 'Space Grotesk', -apple-system, sans-serif;
+  --fps-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --fps-ease-line: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.fps-landing {
+  background-color: var(--fps-bg);
+  color: var(--fps-text);
+  font-family: var(--fps-font-display);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  cursor: default;
+  selection-background-color: var(--fps-gold);
+  selection-color: #000;
+}
+
+.fps-landing ::selection {
+  background: var(--fps-gold);
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Interactive Canvas Background
+   -------------------------------------------------------------------------- */
+.fps-canvas-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* Subtle Vignette & Grain */
+.fps-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(6, 7, 9, 0.85) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Custom Magnetic Follower Cursor
+   -------------------------------------------------------------------------- */
+.fps-cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background-color: var(--fps-gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.06s ease-out, opacity 0.2s;
+  box-shadow: 0 0 10px var(--fps-gold);
+}
+
+.fps-cursor-ring {
+  position: fixed;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(217, 186, 132, 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s var(--fps-ease), height 0.25s var(--fps-ease), border-color 0.25s, transform 0.12s ease-out;
+}
+
+.fps-cursor-ring.active {
+  width: 64px;
+  height: 64px;
+  border-color: var(--fps-gold);
+  background: rgba(217, 186, 132, 0.06);
+}
+
+/* --------------------------------------------------------------------------
+   Main Content Layer
+   -------------------------------------------------------------------------- */
+.fps-content-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Navigation Bar
+   -------------------------------------------------------------------------- */
+.fps-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 36px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(6, 7, 9, 0.7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: padding 0.3s var(--fps-ease);
+}
+
+.fps-nav.scrolled {
+  padding: 16px 36px;
+  background: rgba(6, 7, 9, 0.92);
+  border-bottom-color: rgba(217, 186, 132, 0.2);
+}
+
+.fps-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.fps-logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fps-logo-shield {
+  color: var(--fps-gold);
+}
+
+.fps-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fps-text-muted);
+}
+
+.fps-pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+  animation: fps-pulse 2s infinite;
+}
+
+@keyframes fps-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.fps-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.fps-nav-link {
+  font-family: var(--fps-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fps-text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.25s var(--fps-ease);
+}
+
+.fps-nav-link:hover {
+  color: var(--fps-gold);
+}
+
+.fps-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--fps-gold);
+  transition: width 0.3s var(--fps-ease);
+}
+
+.fps-nav-link:hover::after {
+  width: 100%;
+}
+
+.fps-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fps-btn-minimal {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--fps-text);
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 9px 18px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s var(--fps-ease);
+}
+
+.fps-btn-minimal:hover {
+  border-color: var(--fps-gold);
+  color: var(--fps-gold);
+  background: rgba(217, 186, 132, 0.05);
+}
+
+.fps-btn-primary {
+  background: var(--fps-gold);
+  border: 1px solid var(--fps-gold);
+  color: #060709;
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 9px 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s var(--fps-ease);
+  box-shadow: 0 0 20px rgba(217, 186, 132, 0.25);
+}
+
+.fps-btn-primary:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #060709;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Hero Section
+   -------------------------------------------------------------------------- */
+.fps-hero {
+  position: relative;
+  min-height: 100vh;
+  padding: 180px 48px 60px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.fps-hero-top {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.fps-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.fps-badge-tag {
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fps-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fps-badge-sub {
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  color: var(--fps-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.fps-hero-title {
+  font-size: clamp(40px, 6.8vw, 102px);
+  line-height: 0.96;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  margin-bottom: 36px;
+  user-select: none;
+}
+
+.fps-title-line {
+  display: block;
+  overflow: hidden;
+}
+
+.fps-title-line span {
+  display: inline-block;
+  transform: translateY(0);
+  transition: transform 1s var(--fps-ease);
+}
+
+.fps-hero-title .gold {
+  color: var(--fps-gold);
+  font-style: italic;
+  font-family: 'Syne', var(--fps-font-display);
+  font-weight: 700;
+  text-shadow: 0 0 40px rgba(217, 186, 132, 0.3);
+}
+
+.fps-hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 60px;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+
+.fps-hero-desc {
+  font-family: var(--fps-font-body);
+  font-size: clamp(16px, 1.3vw, 20px);
+  line-height: 1.55;
+  color: #c4c4c8;
+  max-width: 680px;
+}
+
+.fps-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.fps-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+}
+
+.fps-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fps-stat-num {
+  font-family: var(--fps-font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fps-text);
+}
+
+.fps-stat-num span {
+  color: var(--fps-gold);
+  font-size: 20px;
+}
+
+.fps-stat-lbl {
+  font-family: var(--fps-font-mono);
+  font-size: 10px;
+  color: var(--fps-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Hero Bottom Navigation Ticker */
+.fps-hero-bottom {
+  max-width: 1400px;
+  margin: 60px auto 0 auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 24px;
+}
+
+.fps-scroll-prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fps-text-dim);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.fps-scroll-prompt:hover {
+  color: var(--fps-gold);
+}
+
+.fps-scroll-icon {
+  animation: fps-bounce 1.8s infinite;
+}
+
+@keyframes fps-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.fps-hero-live-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  color: var(--fps-text-dim);
+  letter-spacing: 0.06em;
+}
+
+.fps-hero-live-telemetry span.val {
+  color: var(--fps-gold);
+}
+
+/* --------------------------------------------------------------------------
+   60fps.fr Signature Section Header & Glowing Line
+   -------------------------------------------------------------------------- */
+.fps-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 120px 48px;
+  position: relative;
+}
+
+.fps-section-label {
+  position: relative;
+  font-size: clamp(16px, 1.6vw, 22px);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+  user-select: none;
+}
+
+.fps-section-line {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.fps-section-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--fps-gold);
+  border-radius: 40%;
+  transform: scaleX(0) translate(0);
+  transform-origin: left;
+  opacity: 0.8;
+  filter: drop-shadow(0px 0px 6px var(--fps-gold));
+  animation: fps-grow-shrink-move 2.8s var(--fps-ease-line) infinite;
+}
+
+@keyframes fps-grow-shrink-move {
+  0% { transform: scaleX(0) translateX(0); }
+  50% { transform: scaleX(0.7) translateX(30%); }
+  100% { transform: scaleX(1) translateX(100%); }
+}
+
+.fps-label-title {
+  color: var(--fps-text);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.fps-label-count {
+  font-family: var(--fps-font-mono);
+  font-size: 14px;
+  color: var(--fps-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Capabilities & Showcase Grid (60fps Project Cards)
+   -------------------------------------------------------------------------- */
+.fps-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .fps-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .fps-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fps-card {
+  position: relative;
+  background-color: var(--fps-bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  aspect-ratio: 228 / 320;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s var(--fps-ease);
+}
+
+.fps-card:hover {
+  background-color: var(--fps-bg-card-hover);
+  border-color: var(--fps-border-active);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.fps-card-bg-gradient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 100% 0%, rgba(217, 186, 132, 0.12) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s var(--fps-ease);
+  pointer-events: none;
+}
+
+.fps-card:hover .fps-card-bg-gradient {
+  opacity: 1;
+}
+
+.fps-card-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.fps-card-num {
+  font-family: var(--fps-font-mono);
+  font-size: 13px;
+  color: var(--fps-gold);
+}
+
+.fps-card-tag {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 9px;
+  font-family: var(--fps-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #d1d5db;
+}
+
+.fps-card-middle {
+  position: relative;
+  z-index: 2;
+  margin: auto 0 0 0;
+}
+
+.fps-card-icon-wrap {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+  color: var(--fps-gold);
+  transition: all 0.3s var(--fps-ease);
+}
+
+.fps-card:hover .fps-card-icon-wrap {
+  background: var(--fps-gold);
+  color: #000;
+  border-color: var(--fps-gold);
+  transform: scale(1.05);
+}
+
+.fps-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  color: var(--fps-text);
+  text-transform: uppercase;
+}
+
+.fps-card-desc {
+  font-family: var(--fps-font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fps-text-muted);
+}
+
+.fps-card-bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 18px;
+}
+
+.fps-card-metric {
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  color: var(--fps-text-dim);
+}
+
+.fps-card-metric strong {
+  color: var(--fps-gold);
+  font-weight: 600;
+}
+
+.fps-card-arrow {
+  color: var(--fps-text-muted);
+  transform: translateX(0);
+  transition: transform 0.25s var(--fps-ease), color 0.25s;
+}
+
+.fps-card:hover .fps-card-arrow {
+  transform: translateX(4px);
+  color: var(--fps-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Infinite Telemetry Marquee (60fps Precision)
+   -------------------------------------------------------------------------- */
+.fps-marquee-container {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background: #090b0e;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.fps-marquee-track {
+  display: flex;
+  gap: 40px;
+  width: max-content;
+  animation: fps-marquee 36s linear infinite;
+}
+
+.fps-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes fps-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.fps-marquee-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--fps-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  white-space: nowrap;
+}
+
+.fps-marquee-item .symbol {
+  color: var(--fps-gold);
+}
+
+.fps-marquee-item strong {
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Interactive Threat Simulator / Console Showcase
+   -------------------------------------------------------------------------- */
+.fps-simulator-box {
+  background: rgba(10, 12, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 960px) {
+  .fps-simulator-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fps-sim-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fps-sim-tab-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.25s var(--fps-ease);
+}
+
+.fps-sim-tab-btn.active {
+  background: rgba(217, 186, 132, 0.08);
+  border-color: var(--fps-gold);
+}
+
+.fps-sim-tab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.fps-sim-tab-title {
+  font-family: var(--fps-font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--fps-text);
+}
+
+.fps-sim-tab-tag {
+  font-family: var(--fps-font-mono);
+  font-size: 9px;
+  color: var(--fps-gold);
+  border: 1px solid rgba(217, 186, 132, 0.3);
+  padding: 2px 6px;
+}
+
+.fps-sim-tab-desc {
+  font-family: var(--fps-font-body);
+  font-size: 11px;
+  color: var(--fps-text-muted);
+}
+
+.fps-sim-console {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fps-console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.fps-console-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.fps-console-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.fps-console-status {
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  color: var(--fps-gold);
+  letter-spacing: 0.06em;
+}
+
+.fps-console-log {
+  font-family: var(--fps-font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: #e4e4e7;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.fps-log-row {
+  display: flex;
+  gap: 16px;
+}
+
+.fps-log-time {
+  color: var(--fps-text-dim);
+}
+
+.fps-log-hash {
+  color: var(--fps-gold);
+}
+
+.fps-log-highlight {
+  color: #10b981;
+}
+
+.fps-log-warn {
+  color: #ef4444;
+}
+
+.fps-console-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Defense Standards Strip
+   -------------------------------------------------------------------------- */
+.fps-standards-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .fps-standards-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fps-standard-card {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fps-std-code {
+  font-family: var(--fps-font-mono);
+  font-size: 12px;
+  color: var(--fps-gold);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.fps-std-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fps-text);
+}
+
+.fps-std-desc {
+  font-family: var(--fps-font-body);
+  font-size: 12px;
+  color: var(--fps-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Big Call to Action & Footer (60fps Monumental)
+   -------------------------------------------------------------------------- */
+.fps-cta-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 140px 48px 100px 48px;
+  text-align: center;
+  position: relative;
+}
+
+.fps-cta-headline {
+  font-size: clamp(36px, 5.5vw, 84px);
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  max-width: 1000px;
+  margin: 0 auto 36px auto;
+}
+
+.fps-cta-headline .gold {
+  color: var(--fps-gold);
+  font-style: italic;
+  font-family: 'Syne', var(--fps-font-display);
+}
+
+.fps-cta-desc {
+  font-family: var(--fps-font-body);
+  font-size: clamp(16px, 1.2vw, 19px);
+  color: #a1a1aa;
+  max-width: 640px;
+  margin: 0 auto 48px auto;
+  line-height: 1.6;
+}
+
+.fps-cta-btns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.fps-footer {
+  max-width: 1400px;
+  margin: 60px auto 0 auto;
+  padding: 36px 48px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--fps-font-mono);
+  font-size: 11px;
+  color: var(--fps-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fps-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.fps-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.fps-footer a {
+  color: var(--fps-text-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.fps-footer a:hover {
+  color: var(--fps-gold);
+}

@@ -1,0 +1,37 @@
+.blur-text-container {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.blur-text-unit {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(0);
+  transition: none;
+}
+
+.blur-text-unit.direction-top {
+  transform: translateY(-12px);
+}
+
+.blur-text-unit.direction-bottom {
+  transform: translateY(12px);
+}
+
+.blur-text-unit.in-view {
+  animation: blurTextFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes blurTextFadeIn {
+  0% {
+    opacity: 0;
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}

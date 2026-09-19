@@ -1,0 +1,29 @@
+.decrypted-text-wrap {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.decrypted-char {
+  color: inherit;
+  transition: color 0.15s ease;
+}
+
+.encrypted-char {
+  color: var(--primary-gold, #d9ba84);
+  opacity: 0.85;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  text-shadow: 0 0 8px rgba(217, 186, 132, 0.5);
+  display: inline-block;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

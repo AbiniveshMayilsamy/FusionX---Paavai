@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { FileSignature, ShieldCheck, ScrollText, Sparkles } from 'lucide-react';
 
-export function ContractsTab({ onStartExecution }) {
+export function ContractsTab({ onStartExecution, userRole = 'viewer' }) {
+  const isAdmin = userRole === 'admin';
   const [contractId, setContractId] = useState('SCA-2024-001');
   const [contractAddress, setContractAddress] = useState('0x742d35Cc6634C0532925a3b8D4C0d8b3f8e7f1a2');
 
@@ -17,7 +18,7 @@ export function ContractsTab({ onStartExecution }) {
   return (
     <div className="tab-content">
       <h2>
-        <FileSignature size={22} style={{ color: '#ffd700' }} />
+        <FileSignature size={22} style={{ color: 'var(--primary-gold)' }} />
         Legal Agreements & Smart Contract Generator
       </h2>
 
@@ -29,8 +30,8 @@ export function ContractsTab({ onStartExecution }) {
         margin: '20px 0',
         fontFamily: 'serif'
       }}>
-        <h3 style={{ color: '#ffd700', fontFamily: 'Outfit, sans-serif', fontSize: '1.2rem', marginBottom: '8px' }}>
-          📜 SUPPLY CHAIN MASTER SERVICE AGREEMENT
+        <h3 style={{ color: 'var(--primary-gold)', fontFamily: 'Outfit, sans-serif', fontSize: '1.2rem', marginBottom: '8px' }}>
+           SUPPLY CHAIN MASTER SERVICE AGREEMENT
         </h3>
         <p style={{ color: '#94a3b8', fontSize: '0.88rem', fontFamily: 'Outfit, sans-serif', marginBottom: '14px' }}>
           <strong>AGREEMENT NO:</strong> {contractId} | <strong>BLOCKCHAIN HASH:</strong> <code style={{ color: '#38bdf8' }}>{contractAddress}</code>
@@ -47,10 +48,15 @@ export function ContractsTab({ onStartExecution }) {
         </div>
       </div>
 
-      <button className="btn" onClick={handleGenerateContract} style={{ maxWidth: '340px' }}>
+      <button className="btn" onClick={handleGenerateContract} disabled={!isAdmin} style={{ maxWidth: '340px', cursor: isAdmin ? 'pointer' : 'not-allowed', opacity: isAdmin ? 1 : 0.5 }}>
         <Sparkles size={18} />
         Generate New Custom Smart Contract
       </button>
+      {!isAdmin && (
+        <p style={{ fontSize: '0.78rem', color: '#f59e0b', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
+          ⚠ Contract generation requires Admin clearance.
+        </p>
+      )}
     </div>
   );
 }

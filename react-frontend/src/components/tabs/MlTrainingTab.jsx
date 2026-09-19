@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Brain, Play, CheckCircle2, Award, Zap, Activity } from 'lucide-react';
 import { ML_MODELS_DATA } from '../../data/suppliersData';
 
-export function MlTrainingTab({ onStartExecution, onShowDownload }) {
+export function MlTrainingTab({ onStartExecution, onShowDownload, userRole = 'viewer' }) {
+  const isAdmin = userRole === 'admin';
   const [selectedModel, setSelectedModel] = useState('xgboost');
   const [trainedModelData, setTrainedModelData] = useState(null);
   const [isTraining, setIsTraining] = useState(false);
@@ -77,7 +78,7 @@ export function MlTrainingTab({ onStartExecution, onShowDownload }) {
     // Points
     points.forEach((pt, idx) => {
       if (idx % 3 === 0 || idx === epochs) {
-        ctx.fillStyle = '#ffd700';
+        ctx.fillStyle = '#d9ba84';
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
         ctx.fill();
@@ -114,13 +115,13 @@ export function MlTrainingTab({ onStartExecution, onShowDownload }) {
   return (
     <div className="tab-content">
       <h2>
-        <Brain size={22} style={{ color: '#ffd700' }} />
+        <Brain size={22} style={{ color: 'var(--primary-gold)' }} />
         Machine Learning Model Training & Optimization
       </h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', margin: '20px 0' }}>
         <div className="card" style={{ marginBottom: 0 }}>
-          <h3 style={{ fontSize: '1.2rem' }}>📊 Algorithm Architecture Selection</h3>
+          <h3 style={{ fontSize: '1.2rem' }}> Algorithm Architecture Selection</h3>
           <div className="input-group">
             <label htmlFor="modelType">Select Neural / Statistical Model:</label>
             <select
@@ -138,14 +139,19 @@ export function MlTrainingTab({ onStartExecution, onShowDownload }) {
             {ML_MODELS_DATA[selectedModel].description}
           </p>
 
-          <button className="btn" onClick={handleTrain} disabled={isTraining}>
+          <button className="btn" onClick={handleTrain} disabled={isTraining || !isAdmin} style={{ cursor: isAdmin ? 'pointer' : 'not-allowed', opacity: isAdmin ? 1 : 0.5 }}>
             <Play size={18} />
-            {isTraining ? 'Training Model...' : 'Start Training & Evaluation'}
+            {isTraining ? 'Training Model...' : isAdmin ? 'Start Training & Evaluation' : 'Read-Only — Admin Required'}
           </button>
+          {!isAdmin && (
+            <p style={{ fontSize: '0.78rem', color: '#f59e0b', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
+              ⚠ ML model training requires Admin clearance.
+            </p>
+          )}
         </div>
 
         <div className="card" style={{ marginBottom: 0 }}>
-          <h3 style={{ fontSize: '1.2rem' }}>📈 Real-Time Model Performance</h3>
+          <h3 style={{ fontSize: '1.2rem' }}> Real-Time Model Performance</h3>
           {trainedModelData ? (
             <div>
               <div className="stats-grid" style={{ margin: '10px 0 16px 0', gridTemplateColumns: '1fr 1fr' }}>

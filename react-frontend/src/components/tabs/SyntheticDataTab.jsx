@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Database, Key, Dices, CheckCircle, ShieldCheck } from 'lucide-react';
 import { SYNTHETIC_SUPPLIERS_POOL } from '../../data/suppliersData';
 
-export function SyntheticDataTab({ onStartExecution }) {
+export function SyntheticDataTab({ onStartExecution, userRole = 'viewer' }) {
+  const isAdmin = userRole === 'admin';
   const [accessGranted, setAccessGranted] = useState(false);
   const [currentSample, setCurrentSample] = useState(SYNTHETIC_SUPPLIERS_POOL[0]);
 
@@ -22,7 +23,7 @@ export function SyntheticDataTab({ onStartExecution }) {
   return (
     <div className="tab-content">
       <h2>
-        <Database size={22} style={{ color: '#ffd700' }} />
+        <Database size={22} style={{ color: 'var(--primary-gold)' }} />
         Synthetic Dataset Access & Generation
       </h2>
 
@@ -36,7 +37,7 @@ export function SyntheticDataTab({ onStartExecution }) {
         borderLeftWidth: '4px'
       }}>
         <h3 style={{ color: '#fbbf24', fontSize: '1.1rem', marginBottom: '8px' }}>
-          🔐 Automated Synthetic Data Pipeline
+           Automated Synthetic Data Pipeline
         </h3>
         <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.6 }}>
           <strong>Step 1:</strong> Verify administrator security privileges<br />
@@ -47,10 +48,17 @@ export function SyntheticDataTab({ onStartExecution }) {
       </div>
 
       {!accessGranted ? (
-        <button className="btn" onClick={handleRequestAccess} style={{ maxWidth: '320px' }}>
-          <Key size={18} />
-          Request Secure Dataset Access
-        </button>
+        <>
+          <button className="btn" onClick={handleRequestAccess} disabled={!isAdmin} style={{ maxWidth: '320px', cursor: isAdmin ? 'pointer' : 'not-allowed', opacity: isAdmin ? 1 : 0.5 }}>
+            <Key size={18} />
+            Request Secure Dataset Access
+          </button>
+          {!isAdmin && (
+            <p style={{ fontSize: '0.78rem', color: '#f59e0b', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
+              ⚠ Synthetic data access requires Admin clearance.
+            </p>
+          )}
+        </>
       ) : (
         <div style={{ animation: 'fadeIn 0.4s ease' }}>
           <div style={{
@@ -75,7 +83,7 @@ export function SyntheticDataTab({ onStartExecution }) {
             padding: '20px',
             marginBottom: '16px'
           }}>
-            <h4 style={{ color: '#10b981', marginBottom: '10px' }}>🎲 Generated Sample Payload (JSON)</h4>
+            <h4 style={{ color: '#10b981', marginBottom: '10px' }}> Generated Sample Payload (JSON)</h4>
             <pre style={{
               background: 'rgba(0, 0, 0, 0.5)',
               padding: '16px',

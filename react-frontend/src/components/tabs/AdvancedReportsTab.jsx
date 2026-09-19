@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { FileText, Download, CheckCircle2, Shield, Sparkles } from 'lucide-react';
 
 export function AdvancedReportsTab({ onExportReport }) {
@@ -24,7 +24,7 @@ export function AdvancedReportsTab({ onExportReport }) {
   return (
     <div className="tab-content">
       <h2>
-        <FileText size={22} style={{ color: '#ffd700' }} />
+        <FileText size={22} style={{ color: 'var(--primary-gold)' }} />
         Advanced Supply Chain Analytics & Reports
       </h2>
 
@@ -36,12 +36,12 @@ export function AdvancedReportsTab({ onExportReport }) {
             value={reportType}
             onChange={(e) => setReportType(e.target.value)}
           >
-            <option value="vulnerability">🚨 AI Vulnerability Assessment Report</option>
-            <option value="supplier">🏭 Comprehensive Supplier Risk Analysis</option>
-            <option value="alternative">🔄 Alternative Supplier Recommendations</option>
-            <option value="compliance">📋 Compliance & Ownership Audit Report</option>
-            <option value="geopolitical">🌍 Geopolitical Risk Assessment</option>
-            <option value="predictive">🔮 Predictive Analytics Report</option>
+            <option value="vulnerability"> AI Vulnerability Assessment Report</option>
+            <option value="supplier"> Comprehensive Supplier Risk Analysis</option>
+            <option value="alternative"> Alternative Supplier Recommendations</option>
+            <option value="compliance"> Compliance & Ownership Audit Report</option>
+            <option value="geopolitical"> Geopolitical Risk Assessment</option>
+            <option value="predictive"> Predictive Analytics Report</option>
             <option value="blockchain">⛓️ Blockchain Verification Status</option>
           </select>
         </div>
@@ -53,10 +53,10 @@ export function AdvancedReportsTab({ onExportReport }) {
             value={reportFormat}
             onChange={(e) => setReportFormat(e.target.value)}
           >
-            <option value="pdf">📄 Executive Formatted Document (.txt / printable)</option>
-            <option value="excel">📊 Excel Analytics Dashboard (.csv)</option>
-            <option value="json">💾 Structured Machine Data (.json)</option>
-            <option value="powerbi">📈 Power BI Integration Package</option>
+            <option value="pdf"> Executive Formatted Document (.txt / printable)</option>
+            <option value="excel"> Excel Analytics Dashboard (.csv)</option>
+            <option value="json"> Structured Machine Data (.json)</option>
+            <option value="powerbi"> Power BI Integration Package</option>
             <option value="blockchain">⛓️ Cryptographic Blockchain Certificate</option>
           </select>
         </div>
@@ -70,12 +70,12 @@ export function AdvancedReportsTab({ onExportReport }) {
       <div className="results-panel">
         <h3>Recent AI Analysis Results & Audit Logs</h3>
         <div style={{ color: '#cbd5e1', fontSize: '0.92rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <p>• 🤖 <strong>AI Analysis:</strong> Advanced Radar System - Risk Level: High (Confidence: 94%)</p>
-          <p>• 🔍 <strong>Critical Path Analysis:</strong> Tier 3 → Tier 2 → Tier 1 vulnerability chain identified</p>
-          <p>• 🎯 <strong>Alternative Suppliers:</strong> 7 AI-verified options found across 4 sovereign allied countries</p>
+          <p>•  <strong>AI Analysis:</strong> Advanced Radar System - Risk Level: High (Confidence: 94%)</p>
+          <p>•  <strong>Critical Path Analysis:</strong> Tier 3 → Tier 2 → Tier 1 vulnerability chain identified</p>
+          <p>•  <strong>Alternative Suppliers:</strong> 7 AI-verified options found across 4 sovereign allied countries</p>
           <p>• ⛓️ <strong>Blockchain Consensus:</strong> 95% supply chain authenticated with multi-signature validation</p>
-          <p>• 🌍 <strong>Geopolitical Assessment:</strong> 3 medium-risk trading channels flagged for auto-rerouting</p>
-          <p>• 📈 <strong>Predictive Model Accuracy:</strong> 96.2% precision benchmark achieved</p>
+          <p>•  <strong>Geopolitical Assessment:</strong> 3 medium-risk trading channels flagged for auto-rerouting</p>
+          <p>•  <strong>Predictive Model Accuracy:</strong> 96.2% precision benchmark achieved</p>
         </div>
       </div>
     </div>

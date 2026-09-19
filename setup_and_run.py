@@ -11,6 +11,12 @@ import sqlite3
 import time
 from pathlib import Path
 
+# Fix Windows cp1252 encoding for unicode symbols
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 def check_requirements():
     """Check if required packages are installed"""
     try:
@@ -93,10 +99,29 @@ def train_initial_model():
         os.chdir(original_dir)
         return False
 
+def free_port(port):
+    """Free a port if it is already in use by another process."""
+    try:
+        if sys.platform == "win32":
+            output = subprocess.check_output(f"netstat -ano | findstr :{port}", shell=True, stderr=subprocess.DEVNULL).decode()
+            current_pid = str(os.getpid())
+            for line in output.strip().splitlines():
+                parts = line.split()
+                if len(parts) >= 5 and "LISTENING" in parts:
+                    pid = parts[-1]
+                    if pid != current_pid and pid != "0":
+                        subprocess.call(f"taskkill /F /PID {pid}", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        time.sleep(1)
+    except Exception:
+        pass
+
 def start_backend():
     """Start the FastAPI backend"""
     print("\nStarting backend server...")
     
+    # Ensure port 8001 is not locked by a stale process
+    free_port(8001)
+
     try:
         os.chdir("backend")
         # Start backend in a separate process
@@ -109,7 +134,7 @@ def start_backend():
         
         # Check if process is still running
         if backend_process.poll() is None:
-            print("✓ Backend server started successfully at http://localhost:8000")
+            print("✓ Backend server started successfully at http://localhost:8001")
             return backend_process
         else:
             stdout, stderr = backend_process.communicate()
@@ -124,6 +149,9 @@ def start_frontend():
     """Start the Dash frontend"""
     print("\nStarting frontend dashboard...")
     
+    # Ensure port 3000 is not locked by a stale process
+    free_port(3000)
+
     try:
         os.chdir("../frontend")
         # Start frontend in a separate process
@@ -182,9 +210,10 @@ def main():
     print("\n" + "=" * 60)
     print("LinkGuard is now running!")
     print("=" * 60)
-    print("Dashboard: http://localhost:3000")
-    print("API Docs: http://localhost:8000/docs")
-    print("API Base: http://localhost:8000")
+    print("React Dashboard:  http://localhost:5173")
+    print("Dash Dashboard:   http://localhost:3000")
+    print("API Base URL:     http://localhost:8001")
+    print("API Swagger Docs: http://localhost:8001/docs")
     print("\nPress Ctrl+C to stop all services")
     print("=" * 60)
     

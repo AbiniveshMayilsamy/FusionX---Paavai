@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Globe, UserPlus, ShieldCheck } from 'lucide-react';
+import { ShinyText } from './react-bits';
 
-export function SupplierIntelligenceForm({ onAddSupplier }) {
+export function SupplierIntelligenceForm({ onAddSupplier, userRole = 'viewer' }) {
+  const isAdmin = userRole === 'admin';
   const [supplierName, setSupplierName] = useState('');
   const [supplierCountry, setSupplierCountry] = useState('');
   const [ownershipDetails, setOwnershipDetails] = useState('');
@@ -32,8 +34,8 @@ export function SupplierIntelligenceForm({ onAddSupplier }) {
   return (
     <div className="card">
       <h2>
-        <Globe size={22} style={{ color: '#ffd700' }} />
-        Enhanced Supplier Intelligence
+        <Globe size={22} style={{ color: 'var(--primary-gold)' }} />
+        <ShinyText text="Enhanced Supplier Intelligence" color="var(--primary-gold)" shineColor="#ffffff" />
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="input-group">
@@ -93,18 +95,23 @@ export function SupplierIntelligenceForm({ onAddSupplier }) {
               value={geopoliticalRisk}
               onChange={(e) => setGeopoliticalRisk(e.target.value)}
             >
-              <option value="low">🟢 Low Risk</option>
-              <option value="medium">🟡 Medium Risk</option>
-              <option value="high">🟠 High Risk</option>
-              <option value="critical">🔴 Critical Risk</option>
+              <option value="low"> Low Risk</option>
+              <option value="medium"> Medium Risk</option>
+              <option value="high"> High Risk</option>
+              <option value="critical"> Critical Risk</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" className="btn">
+        <button type="submit" className="btn" disabled={!isAdmin} title={!isAdmin ? 'Admin access required' : ''}>
           <UserPlus size={18} />
-          Add Supplier with AI Verification
+          <ShinyText text={isAdmin ? 'Add Supplier with AI Verification' : 'Read-Only — Admin Required'} color="#060709" shineColor="#ffffff" speed={2.5} />
         </button>
+        {!isAdmin && (
+          <p style={{ fontSize: '0.78rem', color: '#f59e0b', marginTop: '8px', fontFamily: 'var(--font-mono)' }}>
+            ⚠ Adding suppliers requires Admin clearance.
+          </p>
+        )}
       </form>
     </div>
   );

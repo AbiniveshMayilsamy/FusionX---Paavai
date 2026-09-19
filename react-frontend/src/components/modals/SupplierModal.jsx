@@ -12,7 +12,7 @@ export function SupplierModal({ supplier, isOpen, onClose, onInitiateAudit }) {
         </button>
 
         <h2 style={{ borderBottom: '1px solid rgba(255,215,0,0.3)', paddingBottom: '12px' }}>
-          <Building2 size={24} style={{ color: '#ffd700' }} />
+          <Building2 size={24} style={{ color: 'var(--primary-gold)' }} />
           {supplier.name}
         </h2>
 
@@ -33,7 +33,7 @@ export function SupplierModal({ supplier, isOpen, onClose, onInitiateAudit }) {
               <strong>Risk Level:</strong> <span style={{ fontWeight: 700, color: supplier.risk === 'Critical' ? '#ef4444' : supplier.risk === 'Medium' ? '#f59e0b' : '#10b981' }}>{supplier.risk}</span>
             </p>
             <p style={{ margin: '8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <BarChart3 size={16} style={{ color: '#ffd700' }} />
+              <BarChart3 size={16} style={{ color: 'var(--primary-gold)' }} />
               <strong>Reliability:</strong> {supplier.reliability}
             </p>
             <p style={{ margin: '8px 0' }}>

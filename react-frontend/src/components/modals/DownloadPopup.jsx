@@ -11,7 +11,7 @@ export function DownloadPopup({ reportType, reportData, isOpen, onClose, onDownl
           <X size={20} />
         </button>
 
-        <h3 style={{ color: '#ffd700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h3 style={{ color: 'var(--primary-gold)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FileText size={22} />
           Export & Download Report
         </h3>

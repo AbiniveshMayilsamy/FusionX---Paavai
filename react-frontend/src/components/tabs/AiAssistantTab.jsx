@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Bot, HelpCircle, Send, Sparkles } from 'lucide-react';
 import { AI_QUERIES_RESPONSES } from '../../data/suppliersData';
 
@@ -19,7 +19,7 @@ export function AiAssistantTab({ onStartExecution }) {
   return (
     <div className="tab-content">
       <h2>
-        <Bot size={22} style={{ color: '#ffd700' }} />
+        <Bot size={22} style={{ color: 'var(--primary-gold)' }} />
         AI Supply Chain Intelligence Assistant
       </h2>
 
@@ -31,7 +31,7 @@ export function AiAssistantTab({ onStartExecution }) {
         margin: '20px 0'
       }}>
         <h3 style={{ color: '#34d399', fontSize: '1.2rem', marginBottom: '12px' }}>
-          🧠 Natural Language Intelligence Engine
+           Natural Language Intelligence Engine
         </h3>
         <p style={{ color: '#cbd5e1', fontSize: '0.9rem', marginBottom: '18px' }}>
           Ask complex queries regarding geopolitical risk exposure, supplier diversification paths, or critical delivery bottlenecks.

@@ -17,7 +17,7 @@ export function SupplyChainMappingTab({ suppliers, onSelectSupplier }) {
   return (
     <div className="tab-content">
       <h2>
-        <Network size={22} style={{ color: '#ffd700' }} />
+        <Network size={22} style={{ color: 'var(--primary-gold)' }} />
         Multi-Tier Supply Chain Visualization
       </h2>
       <p style={{ color: '#cbd5e1', marginBottom: '20px' }}>

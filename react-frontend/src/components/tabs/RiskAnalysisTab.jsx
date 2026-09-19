@@ -10,7 +10,7 @@ export function RiskAnalysisTab({ suppliers }) {
   return (
     <div className="tab-content">
       <h2>
-        <BarChart3 size={22} style={{ color: '#ffd700' }} />
+        <BarChart3 size={22} style={{ color: 'var(--primary-gold)' }} />
         Advanced Risk Assessment Dashboard
       </h2>
 
@@ -46,7 +46,7 @@ export function RiskAnalysisTab({ suppliers }) {
         </div>
       </div>
 
-      <h3 style={{ color: '#ffd700', marginTop: '24px', fontSize: '1.15rem' }}>
+      <h3 style={{ color: 'var(--primary-gold)', marginTop: '24px', fontSize: '1.15rem' }}>
         Overall Supply Chain Threat Spectrum
       </h3>
       <div className="risk-meter">
